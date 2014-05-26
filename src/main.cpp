@@ -1,4 +1,5 @@
 #include <iostream>
+#include <typeinfo>
 #include <glm/vec2.hpp>
 #include <glm/geometric.hpp>
 #include <SFML/Graphics.hpp>
@@ -113,26 +114,56 @@ static void click( const glm::vec2 & pos )
 }
 
 
-static void drag( const glm::vec2 & from, const glm::vec2 & to )
+static Model::APositionable2D * draggedObject = nullptr;
+static Model::Net::APulseNodeActor * linkSource = nullptr;
+static Model::Net::APulseNodeActor * linkSink = nullptr;
+
+
+static void dragStart( const glm::vec2 & from )
 {
 	if( mouseMode != LINK )
 	{
-		Model::APositionable2D * obj = getAt<Model::APositionable2D>( from );
-		if( obj )
+		if( !draggedObject )
+			draggedObject = getAt<Model::APositionable2D>( from );
+	}
+	else
+	{
+		linkSource = getAt<Model::Net::APulseNodeActor>( from );
+	}
+}
+
+
+static void drag( const glm::vec2 & to )
+{
+	if( mouseMode != LINK )
+	{
+		if( draggedObject )
 		{
-			obj->setPosition( to );
+			draggedObject->setPosition( to );
+		}
+	}
+}
+
+
+static void dragStop( const glm::vec2 & to )
+{
+	if( mouseMode != LINK )
+	{
+		if( draggedObject )
+		{
+			draggedObject->setPosition( to );
+			draggedObject = nullptr;
 		}
 	}
 	else
 	{
-		Model::Net::APulseNodeActor * source = getAt<Model::Net::APulseNodeActor>( from );
-		Model::Net::APulseNodeActor * sink = getAt<Model::Net::APulseNodeActor>( to );
-		if( !source || !sink )
+		linkSink = getAt<Model::Net::APulseNodeActor>( to );
+		if( !linkSource || !linkSink )
 			return;
 		Model::Net::PulseLink * link = new Model::Net::PulseLink;
 		pulseLinkRenderer->addModel( link );
 		links.push_back( link );
-		Model::Net::PulseNode::setLink( source->getNode(), sink->getNode(), link );
+		Model::Net::PulseNode::setLink( linkSource->getNode(), linkSink->getNode(), link );
 	}
 }
 
@@ -165,7 +196,7 @@ int main( int argc, char ** argv )
 		{
 			if( event.type == sf::Event::Closed )
 				window.close();
-			static glm::vec2 lastMouseDragStartPos = glm::vec2(0,0);
+			static glm::vec2 lastMousePos = glm::vec2(0,0);
 			static bool dragging = false;
 			switch( event.type )
 			{
@@ -194,7 +225,7 @@ int main( int argc, char ** argv )
 					switch( event.mouseButton.button )
 					{
 					case sf::Mouse::Left:
-						lastMouseDragStartPos = glm::vec2( event.mouseButton.x, event.mouseButton.y );
+						lastMousePos = glm::vec2( event.mouseButton.x, event.mouseButton.y );
 						break;
 					default:
 						break;
@@ -205,8 +236,16 @@ int main( int argc, char ** argv )
 						if( sf::Mouse::isButtonPressed( sf::Mouse::Left ) )
 						{
 							glm::vec2 currentMousePos( event.mouseMove.x, event.mouseMove.y );
-							if( glm::distance( currentMousePos, lastMouseDragStartPos ) >= 5.0f )
-								dragging = true;
+							if( !dragging )
+							{
+								if( glm::distance( currentMousePos, lastMousePos ) >= 5.0f )
+								{
+									dragStart( currentMousePos );
+									dragging = true;
+								}
+							}
+							else
+								drag( currentMousePos );
 						}
 					}
 					break;
@@ -218,7 +257,7 @@ int main( int argc, char ** argv )
 							glm::vec2 currentMousePos( event.mouseButton.x, event.mouseButton.y );
 							if( dragging )
 							{
-								drag( lastMouseDragStartPos, currentMousePos);
+								dragStop( currentMousePos );
 								dragging = false;
 							}
 							else
