@@ -21,14 +21,16 @@ namespace Model
 		public:
 			static bool setLink( PulseNode * source, PulseNode * other, PulseLink * link )
 			{
-				if( source->getOutLinks().size() >= source->getOutLinkCapacity() )
-					return false;
-				if( other->getInLinks().size() >= other->getInLinkCapacity() )
-					return false;
-				link->from = source;
-				link->to = other;
-				Node< PulseNode, PulseLink >::setLink( source, other, link );
-				return true;
+				if( link )
+				{
+					if( source->getOutLinks().size() >= source->getOutLinkCapacity() )
+						return false;
+					if( other->getInLinks().size() >= other->getInLinkCapacity() )
+						return false;
+					link->from = source;
+					link->to = other;
+				}
+				return Node< PulseNode, PulseLink >::setLink( source, other, link );
 			}
 
 			PulseNode() {}

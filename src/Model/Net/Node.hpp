@@ -13,12 +13,6 @@ namespace Model
 		class Node
 		{
 		public:
-			static void setLink( TNode * source, TNode * other, TLink * link )
-			{
-				source->setOutLink( other, link );
-				other->setInLink( source, link );
-			}
-
 			const std::map< const TNode *, TLink * > & getOutLinks() const
 			{
 				return this->outLinks;
@@ -43,6 +37,14 @@ namespace Model
 				if( it == inLinks.end() )
 					return nullptr; // not linked to this node
 				return (*it).second;
+			}
+
+		protected:
+			static bool setLink( TNode * source, TNode * other, TLink * link )
+			{
+				source->setOutLink( other, link );
+				other->setInLink( source, link );
+				return true;
 			}
 
 		private:
