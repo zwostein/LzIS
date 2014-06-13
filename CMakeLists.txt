@@ -22,12 +22,19 @@ if( "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" )
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++11" )
 endif()
 
+
 # wrap the main function for those OSes
 if( ${CMAKE_SYSTEM_NAME} MATCHES "^Windows$|^Android$|^Darwin$" )
 	set( NEED_MAIN_WRAP TRUE )
 endif()
 
-option( USE_SYSTEM_SFML "Use system SFML installation" OFF )
+if( NOT EXISTS "${CMAKE_SOURCE_DIR}/external/SFML/CMakeLists.txt" )
+	set( USE_SYSTEM_SFML_DEFAULT TRUE )
+else()
+	message( STATUS "Found local SFML in external/SFML - Defaulting to NOT use system installation." )
+endif()
+
+option( USE_SYSTEM_SFML "Use system SFML installation" ${USE_SYSTEM_SFML_DEFAULT} )
 if( NOT USE_SYSTEM_SFML )
 	set( BUILD_SHARED_LIBS FALSE CACHE BOOL "Build shared libraries" )
 	add_subdirectory( "external/SFML" )
@@ -46,7 +53,14 @@ else()
 	target_link_libraries( ${EXECUTABLE_NAME} ${SFML_LIBRARIES} )
 endif()
 
-option( USE_SYSTEM_GLM "Use system GLM installation" OFF )
+
+if( NOT EXISTS "${CMAKE_SOURCE_DIR}/external/glm/CMakeLists.txt" )
+	set( USE_SYSTEM_GLM_DEFAULT TRUE )
+else()
+	message( STATUS "Found local GLM in external/glm - Defaulting to NOT use system installation." )
+endif()
+
+option( USE_SYSTEM_GLM "Use system GLM installation" ${USE_SYSTEM_GLM_DEFAULT} )
 if( NOT USE_SYSTEM_GLM )
 	include_directories( "${CMAKE_SOURCE_DIR}/external/glm/" )
 endif()
