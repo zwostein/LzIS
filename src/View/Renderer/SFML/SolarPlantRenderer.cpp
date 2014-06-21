@@ -1,7 +1,16 @@
 #include "SolarPlantRenderer.hpp"
+#include "RenderContext.hpp"
+#include "../RenderFactory.hpp"
+
+#include <vector>
+
+#include <SFML/Graphics.hpp>
 
 
-using namespace View::SFML;
+using namespace View::Renderer::SFML;
+
+
+RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SFML::RenderContext, Model::SolarPlant, SolarPlantRenderer )
 
 
 void SolarPlantRenderer::draw() const
@@ -20,6 +29,6 @@ void SolarPlantRenderer::draw() const
 		else
 			circle.setFillColor( sf::Color( 64, 64, 0 ) );
 
-		this->window.draw( circle );
+		this->context.getRenderWindow()->draw( circle );
 	}
 }

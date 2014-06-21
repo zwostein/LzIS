@@ -1,9 +1,17 @@
 #include "PulseLinkRenderer.hpp"
-#include "../../Model/Net/PulseNode.hpp"
+#include "RenderContext.hpp"
+#include "../RenderFactory.hpp"
+#include "../../../Model/Net/PulseNode.hpp"
+
 #include <glm/geometric.hpp>
 
+#include <SFML/Graphics.hpp>
 
-using namespace View::SFML;
+
+using namespace View::Renderer::SFML;
+
+
+RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SFML::RenderContext, Model::Net::PulseLink, PulseLinkRenderer )
 
 
 void PulseLinkRenderer::draw() const
@@ -19,6 +27,6 @@ void PulseLinkRenderer::draw() const
 			sf::Vertex(sf::Vector2f( from.x, from.y ), m->pulse?sf::Color( 128, 0, 255 ):sf::Color( 128, 0, 255, 64 ) ),
 			sf::Vertex(sf::Vector2f( to.x, to.y ), m->pulse?sf::Color( 64, 0, 255 ):sf::Color( 64, 0, 255, 64 ) )
 		};
-		this->window.draw( line, 2, sf::Lines );
+		this->context.getRenderWindow()->draw( line, 2, sf::Lines );
 	}
 }

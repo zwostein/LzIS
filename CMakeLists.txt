@@ -6,18 +6,38 @@ set( CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeModules" ${CMAKE_MODULE_PATH} )
 set( EXECUTABLE_NAME "lzis" )
 add_executable( ${EXECUTABLE_NAME}
 	src/main.cpp
+
+	src/Model/EventSystem.cpp
 	src/Model/Updater.cpp
 	src/Model/IntervalStepUpdater.cpp
+
 	src/Model/Net/PulseDistributor.cpp
-	src/Model/Station/Hub.cpp
+	src/Model/Net/PulseNode.cpp
+
+	src/Model/Station/AStation.cpp
 	src/Model/Station/SolarPlant.cpp
 	src/Model/Station/Phaser.cpp
-#	src/View/SFML/SolarPlantRenderer.cpp
-#	src/View/SFML/PhaserRenderer.cpp
-#	src/View/SFML/PulseLinkRenderer.cpp
-	src/View/SDL2/SolarPlantRenderer.cpp
-	src/View/SDL2/PhaserRenderer.cpp
-	src/View/SDL2/PulseLinkRenderer.cpp
+	src/Model/Station/Hub.cpp
+
+	src/View/OrderedDrawer.cpp
+	src/View/Renderer/RenderFactory.cpp
+
+	src/View/SDL2/Window.cpp
+	src/View/SFML/Window.cpp
+
+	src/View/Renderer/SFML/SolarPlantRenderer.cpp
+	src/View/Renderer/SFML/PhaserRenderer.cpp
+	src/View/Renderer/SFML/PulseLinkRenderer.cpp
+
+	src/View/Renderer/SDL2/SolarPlantRenderer.cpp
+	src/View/Renderer/SDL2/PhaserRenderer.cpp
+	src/View/Renderer/SDL2/PulseLinkRenderer.cpp
+
+#	src/View/Renderer/GLES2/SolarPlantRenderer.cpp
+#	src/View/Renderer/GLES2/PhaserRenderer.cpp
+#	src/View/Renderer/GLES2/PulseLinkRenderer.cpp
+#	src/View/Renderer/GLES2/Shader.cpp
+#	src/View/Renderer/GLES2/Error.cpp
 )
 
 # configure compiler for c++11 etc.

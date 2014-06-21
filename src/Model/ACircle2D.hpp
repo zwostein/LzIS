@@ -11,7 +11,7 @@ namespace Model
 	{
 	public:
 		virtual float getRadius() const = 0;
-		virtual void setRadius( float size ) = 0;
+		virtual void setRadius( float radius ) = 0;
 	};
 }
 

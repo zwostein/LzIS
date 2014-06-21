@@ -1,9 +1,17 @@
 #include "PulseLinkRenderer.hpp"
-#include "../../Model/Net/PulseNode.hpp"
+#include "RenderContext.hpp"
+#include "../RenderFactory.hpp"
+#include "../../../Model/Net/PulseNode.hpp"
+
 #include <glm/geometric.hpp>
 
+#include <SDL_render.h>
 
-using namespace View::SDL2;
+
+using namespace View::Renderer::SDL2;
+
+
+RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SDL2::RenderContext, Model::Net::PulseLink, PulseLinkRenderer )
 
 
 void PulseLinkRenderer::draw() const
@@ -14,11 +22,11 @@ void PulseLinkRenderer::draw() const
 			continue;
 
 		if( m->pulse )
-			SDL_SetRenderDrawColor( this->renderer, 128, 0, 255, 255 );
+			SDL_SetRenderDrawColor( this->context.getRenderer(), 128, 0, 255, 255 );
 		else
-			SDL_SetRenderDrawColor( this->renderer, 64, 0, 255, 255 );
+			SDL_SetRenderDrawColor( this->context.getRenderer(), 64, 0, 255, 255 );
 
-		SDL_RenderDrawLine( this->renderer,
+		SDL_RenderDrawLine( this->context.getRenderer(),
 		                    m->from->getPosition().x, m->from->getPosition().y,
 		                    m->to->getPosition().x, m->to->getPosition().y );
 
@@ -27,7 +35,7 @@ void PulseLinkRenderer::draw() const
 		glm::vec2 arrowFrom = m->to->getPosition() - 12.0f*lineDir;
 		glm::vec2 arrowTo = arrowFrom + 10.0f*perpDir - 15.0f*lineDir;
 
-		SDL_RenderDrawLine( this->renderer,
+		SDL_RenderDrawLine( this->context.getRenderer(),
 		                    arrowFrom.x, arrowFrom.y,
 		                    arrowTo.x, arrowTo.y );
 	}

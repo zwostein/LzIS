@@ -17,6 +17,8 @@ public:
 	{
 		std::vector< std::vector< const T * > > foundGoals;
 		std::vector< const T * > successors = this->getSuccessors( from );
+		//TODO: could the next loop be omitted if currentDepth < maxDepth ?
+		//      this would only search on maxdepth level - all that should be needed for iterative deepening
 		for( auto & successor : successors )
 		{
 			if( this->isGoal( successor ) )

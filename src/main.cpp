@@ -5,7 +5,7 @@
 #include <glm/vec2.hpp>
 #include <glm/geometric.hpp>
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 //#include <SFML/Graphics.hpp>
 
 #include "Model/Updater.hpp"
@@ -15,15 +15,11 @@
 #include "Model/Station/Hub.hpp"
 #include "Model/Net/PulseDistributor.hpp"
 #include "Model/Net/PulseNode.hpp"
-/*
-#include "View/SFML/SolarPlantRenderer.hpp"
-#include "View/SFML/PhaserRenderer.hpp"
-#include "View/SFML/PulseLinkRenderer.hpp"
-*/
 
-#include "View/SDL2/SolarPlantRenderer.hpp"
-#include "View/SDL2/PhaserRenderer.hpp"
-#include "View/SDL2/PulseLinkRenderer.hpp"
+#include "View/OrderedDrawer.hpp"
+#include "View/Renderer/RenderFactory.hpp"
+#include "View/SDL2/Window.hpp"
+#include "View/SFML/Window.hpp"
 
 
 enum MouseMode
@@ -37,17 +33,13 @@ enum MouseMode
 
 MouseMode mouseMode = SOLARPLANT;
 
-Model::Updater * updater;
-Model::IntervalStepUpdater * intervalStepUpdater;
-Model::Net::PulseDistributor * pulseDistributor;
-/*
-View::SFML::SolarPlantRenderer * solarPlantRenderer;
-View::SFML::PhaserRenderer * phaserRenderer;
-View::SFML::PulseLinkRenderer * pulseLinkRenderer;
-*/
-View::SDL2::SolarPlantRenderer * solarPlantRenderer;
-View::SDL2::PhaserRenderer * phaserRenderer;
-View::SDL2::PulseLinkRenderer * pulseLinkRenderer;
+Model::Updater * updater = nullptr;
+Model::IntervalStepUpdater * intervalStepUpdater = nullptr;
+Model::Net::PulseDistributor * pulseDistributor = nullptr;
+
+View::Renderer::ARenderer< Model::SolarPlant > * solarPlantRenderer = nullptr;
+View::Renderer::ARenderer< Model::Phaser > * phaserRenderer = nullptr;
+View::Renderer::ARenderer< Model::Net::PulseLink > * pulseLinkRenderer = nullptr;
 
 std::set< Model::SolarPlant * > solarPlants;
 std::set< Model::Phaser * > phasers;
@@ -60,29 +52,29 @@ static T * getAt( const glm::vec2 & pos )
 {
 	for( auto i : solarPlants )
 	{
-		if( pos.x > i->getMinCorner().x
-		 && pos.x < i->getMaxCorner().x
-		 && pos.y > i->getMinCorner().y
-		 && pos.y < i->getMaxCorner().y
+		if( pos.x > i->getPosition().x - i->getRadius()
+		 && pos.x < i->getPosition().x + i->getRadius()
+		 && pos.y > i->getPosition().y - i->getRadius()
+		 && pos.y < i->getPosition().y + i->getRadius()
 		)
 			return i;
 	}
 	for( auto i : phasers )
 	{
-		if( pos.x > i->getMinCorner().x
-		 && pos.x < i->getMaxCorner().x
-		 && pos.y > i->getMinCorner().y
-		 && pos.y < i->getMaxCorner().y
+		if( pos.x > i->getPosition().x - i->getRadius()
+		 && pos.x < i->getPosition().x + i->getRadius()
+		 && pos.y > i->getPosition().y - i->getRadius()
+		 && pos.y < i->getPosition().y + i->getRadius()
 		)
 			return i;
 	}
 /*
 	for( auto i : hubs )
 	{
-		if( pos.x > i->getMinCorner().x
-		 && pos.x < i->getMaxCorner().x
-		 && pos.y > i->getMinCorner().y
-		 && pos.y < i->getMaxCorner().y
+		if( pos.x > i->getPosition().x - i->getRadius()
+		 && pos.x < i->getPosition().x + i->getRadius()
+		 && pos.y > i->getPosition().y - i->getRadius()
+		 && pos.y < i->getPosition().y + i->getRadius()
 		)
 			return i;
 	}
@@ -93,7 +85,7 @@ static T * getAt( const glm::vec2 & pos )
 
 static void click( const glm::vec2 & pos )
 {
-	Model::ABoundingBox2D * obj = getAt<Model::ABoundingBox2D>( pos );
+	Model::AStation * obj = getAt<Model::AStation>( pos );
 	if( obj )
 	{
 		if( typeid( *obj ) == typeid( Model::SolarPlant ) )
@@ -106,21 +98,19 @@ static void click( const glm::vec2 & pos )
 	{
 	case SOLARPLANT:
 	{
-		Model::SolarPlant * m = new Model::SolarPlant;
+		Model::SolarPlant * m = new Model::SolarPlant();
 		m->setPosition( pos );
 		solarPlants.insert( m );
 		updater->addUpdateable( m );
-		solarPlantRenderer->addModel( m );
 		pulseDistributor->addProvider( m );
 		break;
 	}
 	case PHASER:
 	{
-		Model::Phaser * m = new Model::Phaser;
+		Model::Phaser * m = new Model::Phaser();
 		m->setPosition( pos );
 		phasers.insert( m );
 		updater->addUpdateable( m );
-		phaserRenderer->addModel( m );
 		pulseDistributor->addConsumer( m );
 		break;
 	}
@@ -130,7 +120,7 @@ static void click( const glm::vec2 & pos )
 }
 
 
-static Model::APositionable2D * draggedObject = nullptr;
+static Model::AStation * draggedObject = nullptr;
 static Model::Net::APulseNodeActor * linkSource = nullptr;
 static Model::Net::APulseNodeActor * linkSink = nullptr;
 
@@ -143,7 +133,7 @@ static void dragStart( const glm::vec2 & from )
 		case PHASER:
 		case HUB:
 			if( !draggedObject )
-				draggedObject = getAt<Model::APositionable2D>( from );
+				draggedObject = getAt<Model::AStation>( from );
 			break;
 		case LINK:
 		case UNLINK:
@@ -192,7 +182,7 @@ static void dragStop( const glm::vec2 & to )
 				Model::Net::PulseLink * link = new Model::Net::PulseLink;
 				if( Model::Net::PulseNode::setLink( linkSource->getNode(), linkSink->getNode(), link ) )
 				{
-					pulseLinkRenderer->addModel( link );
+					pulseLinkRenderer->addModel( *link );
 					links.insert( link );
 				}
 			}
@@ -207,7 +197,7 @@ static void dragStop( const glm::vec2 & to )
 				{
 					if( Model::Net::PulseNode::setLink( linkSource->getNode(), linkSink->getNode(), nullptr ) )
 					{
-						pulseLinkRenderer->removeModel( link );
+						pulseLinkRenderer->removeModel( *link );
 						links.erase( link );
 					}
 				}
@@ -224,34 +214,7 @@ int main( int argc, char ** argv )
 	window.setVerticalSyncEnabled(true);
 	*/
 
-
-	SDL_Init( SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER );
-	SDL_Window * window = SDL_CreateWindow(
-		"LzIS",                 // window title
-		SDL_WINDOWPOS_CENTERED, // the x position of the window
-		SDL_WINDOWPOS_CENTERED, // the y position of the window
-		800, 600,               // window width and height
-		0                       // flags
-	);
-	if( !window )
-	{
-		std::cerr << "Could not create SDL2 window: " << SDL_GetError() << std::endl;
-		return 1;
-	}
-	SDL_Renderer * renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_PRESENTVSYNC );
-	if( !renderer )
-	{
-		std::cerr << "Could not create SDL2 renderer: " << SDL_GetError() << std::endl;
-		return 1;
-	}
-	SDL_RendererInfo info;
-	if( SDL_GetRendererInfo( renderer, &info ) )
-	{
-		std::cerr << "Unable to retrieve SDL2 renderer information: " << SDL_GetError() << std::endl;
-		return false;
-	}
-	std::cerr << "SDL2 renderer name: " << info.name << std::endl;
-
+	View::AWindow * window = new View::SDL2::Window( "LzIS" );
 
 	pulseDistributor = new Model::Net::PulseDistributor;
 
@@ -261,16 +224,17 @@ int main( int argc, char ** argv )
 
 	updater = new Model::Updater;
 	updater->addUpdateable( intervalStepUpdater );
-/*
-	solarPlantRenderer = new View::SFML::SolarPlantRenderer( window );
-	phaserRenderer = new View::SFML::PhaserRenderer( window );
-	pulseLinkRenderer = new View::SFML::PulseLinkRenderer( window );
-*/
 
-	solarPlantRenderer = new View::SDL2::SolarPlantRenderer( renderer );
-	phaserRenderer = new View::SDL2::PhaserRenderer( renderer );
-	pulseLinkRenderer = new View::SDL2::PulseLinkRenderer( renderer );
+	View::Renderer::ARenderContext * context = window->getContext();
+	solarPlantRenderer = View::Renderer::RenderFactory::newRenderer<Model::SolarPlant>( *context );
+	phaserRenderer = View::Renderer::RenderFactory::newRenderer<Model::Phaser>( *context );
+	pulseLinkRenderer = View::Renderer::RenderFactory::newRenderer<Model::Net::PulseLink>( *context );
 
+	View::OrderedDrawer * drawer = new View::OrderedDrawer;
+	drawer->addDrawable( pulseLinkRenderer, 0 );
+	drawer->addDrawable( phaserRenderer, 1 );
+	drawer->addDrawable( solarPlantRenderer, 2 );
+	window->setDrawable( drawer );
 /*
 	sf::Clock clock;
 	while( window.isOpen() )
@@ -387,7 +351,7 @@ int main( int argc, char ** argv )
 		SDL_Event event;
 		while( SDL_PollEvent(&event) )
 		{
-			static glm::vec2 lastMousePos = glm::vec2(0,0);
+			static glm::vec2 mousePosOnLeftButtonDown = glm::vec2(0,0);
 			static bool dragging = false;
 			switch( event.type )
 			{
@@ -425,7 +389,7 @@ int main( int argc, char ** argv )
 					switch( event.button.button )
 					{
 					case SDL_BUTTON_LEFT:
-						lastMousePos = glm::vec2( event.button.x, event.button.y );
+						mousePosOnLeftButtonDown = glm::vec2( event.button.x, event.button.y );
 						break;
 					default:
 						break;
@@ -438,10 +402,11 @@ int main( int argc, char ** argv )
 							glm::vec2 currentMousePos( event.motion.x, event.motion.y );
 							if( !dragging )
 							{
-								if( glm::distance( currentMousePos, lastMousePos ) >= 5.0f )
+								if( glm::distance( currentMousePos, mousePosOnLeftButtonDown ) >= 5.0f )
 								{
-									dragStart( currentMousePos );
+									dragStart( mousePosOnLeftButtonDown );
 									dragging = true;
+									drag( currentMousePos );
 								}
 							}
 							else
@@ -477,13 +442,10 @@ int main( int argc, char ** argv )
 
 		updater->update( delta );
 
-		SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0 );
-		SDL_RenderClear( renderer );
-
-		pulseLinkRenderer->draw();
-		solarPlantRenderer->draw();
-		phaserRenderer->draw();
-
-		SDL_RenderPresent( renderer );
+		window->draw();
 	}
+
+	for( auto & solarPlant : solarPlants )
+		delete solarPlant;
+	solarPlants.clear();
 }
