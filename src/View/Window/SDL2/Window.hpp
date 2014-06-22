@@ -2,8 +2,8 @@
 #define _VIEW_SDL2_WINDOW_INCLUDED_
 
 
-#include "../AWindow.hpp"
-#include "../Renderer/ARenderContext.hpp"
+#include <View/Window/AWindow.hpp>
+#include <View/Renderer/ARenderContext.hpp>
 
 #include <string>
 #include <memory>
@@ -16,17 +16,14 @@ namespace View
 		class Window : public AWindow
 		{
 		public:
-			Window( const std::string & name );
+			Window( const std::string & title, Model::EventHandler * eventHandler = nullptr );
 			virtual ~Window();
+
+			virtual std::string getName() const override
+				{ return "SDL2"; }
 
 			virtual Renderer::ARenderContext * getContext() const override
 				{ return context; }
-
-			virtual void setDrawable( const ADrawable * drawable ) override
-				{ this->drawable = drawable; }
-
-			virtual const ADrawable * getDrawable() const override
-				{ return this->drawable; }
 
 			virtual void draw() const override;
 
@@ -34,7 +31,6 @@ namespace View
 			class Impl;
 			std::unique_ptr< Impl > pImpl;
 
-			const ADrawable * drawable;
 			Renderer::ARenderContext * context;
 		};
 	}

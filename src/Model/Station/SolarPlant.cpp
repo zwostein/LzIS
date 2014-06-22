@@ -1,16 +1,15 @@
-#include "SolarPlant.hpp"
-#include "../EventSystem.hpp"
-#include "../NewObjectEvent.hpp"
-#include "../DeleteObjectEvent.hpp"
-#include "../Net/PulseNode.hpp"
+#include <Model/Station/SolarPlant.hpp>
+
+#include <Model/EventSystem.hpp>
+#include <Model/Net/PulseNode.hpp>
 
 
-using namespace Model;
+using namespace Model::Station;
 
 
 SolarPlant::SolarPlant( EventHandler * eventHandler ) : AStation(eventHandler)
 {
-	this->node = new Net::PulseNode;
+	this->node = new Net::PulseNode( eventHandler );
 	node->setInLinkCapacity( 0 );
 	node->setOutLinkCapacity( 3 );
 	this->dispatch( NewEvent(*this) );

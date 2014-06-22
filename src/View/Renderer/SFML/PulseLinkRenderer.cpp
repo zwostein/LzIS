@@ -1,7 +1,7 @@
-#include "PulseLinkRenderer.hpp"
-#include "RenderContext.hpp"
-#include "../RenderFactory.hpp"
-#include "../../../Model/Net/PulseNode.hpp"
+#include <View/Renderer/SFML/PulseLinkRenderer.hpp>
+#include <View/Renderer/SFML/RenderContext.hpp>
+#include <View/Renderer/RenderFactory.hpp>
+#include <Model/Net/PulseNode.hpp>
 
 #include <glm/geometric.hpp>
 

@@ -13,22 +13,25 @@ namespace Model
 		class Node
 		{
 		public:
-			static bool setLink( TNode * source, TNode * other, TLink * link )
+			static TLink * setLink( TNode * source, TNode * other, TLink * link )
 			{
-				bool isLinked = source->getOutLink( other );
+				TLink * oldLink = source->getOutLink( other );
 				if( link ) // if linking
 				{
-					if( isLinked )
-						return false;
+					if( oldLink )
+						return nullptr;
+					source->setOutLink( other, link );
+					other->setInLink( source, link );
+					return link;
 				}
-				else
+				else // delete existing link
 				{
-					if( !isLinked )
-						return false;
+					if( !oldLink )
+						return nullptr;
+					source->setOutLink( other, nullptr );
+					other->setInLink( source, nullptr );
+					return oldLink;
 				}
-				source->setOutLink( other, link );
-				other->setInLink( source, link );
-				return true;
 			}
 
 			const std::map< const TNode *, TLink * > & getOutLinks() const
@@ -41,7 +44,7 @@ namespace Model
 				return this->inLinks;
 			}
 
-			const TLink * getOutLink( const TNode * other ) const
+			TLink * getOutLink( const TNode * other ) const
 			{
 				auto it = this->outLinks.find( other );
 				if( it == outLinks.end() )
@@ -49,7 +52,7 @@ namespace Model
 				return (*it).second;
 			}
 
-			const TLink * getInLink( const TNode * other ) const
+			TLink * getInLink( const TNode * other ) const
 			{
 				auto it = this->inLinks.find( other );
 				if( it == inLinks.end() )

@@ -2,7 +2,7 @@
 #define _MODEL_ACIRCLE2D_INCLUDED_
 
 
-#include "APositionable2D.hpp"
+#include <Model/APositionable2D.hpp>
 
 
 namespace Model

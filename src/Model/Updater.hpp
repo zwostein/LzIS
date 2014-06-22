@@ -2,8 +2,8 @@
 #define _MODEL_UPDATER_INCLUDED_
 
 
-#include "AUpdater.hpp"
-#include "AUpdateable.hpp"
+#include <Model/AUpdater.hpp>
+#include <Model/AUpdateable.hpp>
 
 #include <vector>
 

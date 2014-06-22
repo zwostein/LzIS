@@ -1,6 +1,6 @@
-#include "PhaserRenderer.hpp"
-#include "RenderContext.hpp"
-#include "../RenderFactory.hpp"
+#include <View/Renderer/SFML/PhaserRenderer.hpp>
+#include <View/Renderer/SFML/RenderContext.hpp>
+#include <View/Renderer/RenderFactory.hpp>
 
 #include <SFML/Graphics.hpp>
 
@@ -8,7 +8,7 @@
 using namespace View::Renderer::SFML;
 
 
-RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SFML::RenderContext, Model::Phaser, PhaserRenderer )
+RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SFML::RenderContext, Model::Station::Phaser, PhaserRenderer )
 
 
 void PhaserRenderer::draw() const
@@ -18,7 +18,7 @@ void PhaserRenderer::draw() const
 	circle.setOutlineColor( sf::Color::White );
 	circle.setOutlineThickness( 2.0f );
 
-	for( const Model::Phaser * m : this->getModels() )
+	for( const Model::Station::Phaser * m : this->getModels() )
 	{
 		circle.setPosition( m->getPosition().x, m->getPosition().y );
 

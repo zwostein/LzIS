@@ -2,9 +2,10 @@
 #define _MODEL_NET_PULSENODE_INCLUDED_
 
 
-#include "Node.hpp"
-#include "PulseLink.hpp"
-#include "../AStepUpdateable.hpp"
+#include <Model/Net/Node.hpp>
+#include <Model/Net/PulseLink.hpp>
+#include <Model/AStepUpdateable.hpp>
+#include <Model/EventSystem.hpp>
 
 #include <glm/vec2.hpp>
 
@@ -16,12 +17,24 @@ namespace Model
 {
 	namespace Net
 	{
-		class PulseNode : public Node< PulseNode, PulseLink >, public AStepUpdateable
+		class PulseNode : public Node< PulseNode, PulseLink >, public AStepUpdateable, public AAutoEventSource
 		{
 		public:
-			static bool setLink( PulseNode * source, PulseNode * other, PulseLink * link );
+			struct NewLinkEvent
+			{
+				NewLinkEvent( const PulseLink & link ) : link(link) {}
+				const PulseLink & link;
+			};
 
-			PulseNode() {}
+			struct DeleteLinkEvent
+			{
+				DeleteLinkEvent( const PulseLink & link ) : link(link) {}
+				const PulseLink & link;
+			};
+
+			static PulseLink * setLink( PulseNode * source, PulseNode * other, PulseLink * link );
+
+			PulseNode( EventHandler * eventHandler ) : AAutoEventSource( eventHandler ) {}
 			virtual ~PulseNode() {}
 
 			const glm::vec2 & getPosition() const { return this->position; }

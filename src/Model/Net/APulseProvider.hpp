@@ -2,7 +2,7 @@
 #define _MODEL_NET_APULSEPROVIDER_INCLUDED_
 
 
-#include "APulseNodeActor.hpp"
+#include <Model/Net/APulseNodeActor.hpp>
 
 
 namespace Model

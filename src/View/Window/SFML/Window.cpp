@@ -1,5 +1,5 @@
-#include "Window.hpp"
-#include "../Renderer/SFML/RenderContext.hpp"
+#include <View/Window/SFML/Window.hpp>
+#include <View/Renderer/SFML/RenderContext.hpp>
 
 #include <iostream>
 #include <stdexcept>
@@ -18,12 +18,12 @@ public:
 };
 
 
-Window::Window( const std::string & name ) : pImpl( new Impl )
+Window::Window( const std::string & title, Model::EventHandler * eventHandler ) : AWindow(eventHandler), pImpl( new Impl )
 {
-	this->pImpl->renderWindow = new sf::RenderWindow( sf::VideoMode(800, 600), name );
+	this->pImpl->renderWindow = new sf::RenderWindow( sf::VideoMode(800, 600), title );
 	this->pImpl->renderWindow->setVerticalSyncEnabled( true );
 
-	this->context = new Renderer::SFML::RenderContext( this->pImpl->renderWindow );
+	this->context = new Renderer::SFML::RenderContext( eventHandler, this->pImpl->renderWindow );
 }
 
 
@@ -38,8 +38,8 @@ void Window::draw() const
 {
 	this->pImpl->renderWindow->clear( sf::Color::Black );
 
-	if( this->drawable )
-		this->drawable->draw();
+	if( this->getDrawable() )
+		this->getDrawable()->draw();
 
 	this->pImpl->renderWindow->display();
 }

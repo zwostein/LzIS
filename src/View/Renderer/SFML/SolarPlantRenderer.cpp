@@ -1,6 +1,6 @@
-#include "SolarPlantRenderer.hpp"
-#include "RenderContext.hpp"
-#include "../RenderFactory.hpp"
+#include <View/Renderer/SFML/SolarPlantRenderer.hpp>
+#include <View/Renderer/SFML/RenderContext.hpp>
+#include <View/Renderer/RenderFactory.hpp>
 
 #include <vector>
 
@@ -10,7 +10,7 @@
 using namespace View::Renderer::SFML;
 
 
-RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SFML::RenderContext, Model::SolarPlant, SolarPlantRenderer )
+RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SFML::RenderContext, Model::Station::SolarPlant, SolarPlantRenderer )
 
 
 void SolarPlantRenderer::draw() const
@@ -20,7 +20,7 @@ void SolarPlantRenderer::draw() const
 	circle.setOutlineColor( sf::Color::White );
 	circle.setOutlineThickness( 2.0f );
 
-	for( const Model::SolarPlant * m : this->getModels() )
+	for( const Model::Station::SolarPlant * m : this->getModels() )
 	{
 		circle.setPosition( m->getPosition().x, m->getPosition().y );
 

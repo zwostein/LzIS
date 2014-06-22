@@ -2,8 +2,9 @@
 #define _VIEW_RENDERER_SDL2_PHASERRENDERER_INCLUDED_
 
 
-#include "../AUnorderedRenderer.hpp"
-#include "../../../Model/Station/Phaser.hpp"
+#include <View/Renderer/SDL2/RenderContext.hpp>
+#include <View/Renderer/AUnorderedRenderer.hpp>
+#include <Model/Station/Phaser.hpp>
 
 
 namespace View
@@ -12,22 +13,25 @@ namespace View
 	{
 		namespace SDL2
 		{
-			class RenderContext;
 			class PhaserRenderer :
-				public AUnorderedRenderer< Model::Phaser >,
-				public Model::AAutoEventListener< Model::Phaser::NewEvent >,
-				public Model::AAutoEventListener< Model::Phaser::DeleteEvent >
+				public AUnorderedRenderer< Model::Station::Phaser >,
+				public Model::AAutoEventListener< Model::Station::Phaser::NewEvent >,
+				public Model::AAutoEventListener< Model::Station::Phaser::DeleteEvent >
 			{
 			public:
-				PhaserRenderer( RenderContext & context ) : context(context) {}
+				PhaserRenderer( RenderContext & context ) :
+					Model::AAutoEventListener< Model::Station::Phaser::NewEvent >( context.getEventHandler() ),
+					Model::AAutoEventListener< Model::Station::Phaser::DeleteEvent >( context.getEventHandler() ),
+					context(context)
+					{}
 				virtual ~PhaserRenderer() {}
 
 				virtual void draw() const override;
 
-				virtual void onEvent( const Model::Phaser::NewEvent & event )
+				virtual void onEvent( const Model::Station::Phaser::NewEvent & event )
 					{ this->addModel( event.phaser ); }
-				virtual void onEvent( const Model::Phaser::DeleteEvent & event )
-					{ this->removeModel( event.phaser ); };
+				virtual void onEvent( const Model::Station::Phaser::DeleteEvent & event )
+					{ this->removeModel( event.phaser ); }
 
 			private:
 				RenderContext & context;

@@ -22,8 +22,8 @@ add_executable( ${EXECUTABLE_NAME}
 	src/View/OrderedDrawer.cpp
 	src/View/Renderer/RenderFactory.cpp
 
-	src/View/SDL2/Window.cpp
-	src/View/SFML/Window.cpp
+	src/View/Window/SDL2/Window.cpp
+	src/View/Window/SFML/Window.cpp
 
 	src/View/Renderer/SFML/SolarPlantRenderer.cpp
 	src/View/Renderer/SFML/PhaserRenderer.cpp
@@ -39,6 +39,8 @@ add_executable( ${EXECUTABLE_NAME}
 #	src/View/Renderer/GLES2/Shader.cpp
 #	src/View/Renderer/GLES2/Error.cpp
 )
+
+include_directories( "${CMAKE_SOURCE_DIR}/src" )
 
 # configure compiler for c++11 etc.
 if( "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" )

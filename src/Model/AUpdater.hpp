@@ -2,7 +2,7 @@
 #define _MODEL_AUPDATER_INCLUDED_
 
 
-#include "AUpdateable.hpp"
+#include <Model/AUpdateable.hpp>
 
 
 namespace Model

@@ -2,7 +2,7 @@
 #define _VIEW_RENDERER_SDL2_RENDERCONTEXT_INCLUDED_
 
 
-#include "../ARenderContext.hpp"
+#include <View/Renderer/ARenderContext.hpp>
 
 
 struct SDL_Renderer;
@@ -17,10 +17,16 @@ namespace View
 			class RenderContext : public ARenderContext
 			{
 			public:
-				RenderContext( SDL_Renderer * renderer ) : renderer(renderer) {}
+				RenderContext( Model::EventHandler * eventHandler, SDL_Renderer * renderer ) :
+					ARenderContext(eventHandler),
+					renderer(renderer)
+				{}
 				virtual ~RenderContext() {}
+
 				virtual std::string getName() const override { return "SDL2"; }
+
 				SDL_Renderer * getRenderer() const { return this->renderer; }
+
 			private:
 				SDL_Renderer * renderer;
 			};

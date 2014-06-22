@@ -2,8 +2,8 @@
 #define _MODEL_INTERVALSTEPUPDATER_INCLUDED_
 
 
-#include "AUpdateable.hpp"
-#include "AStepUpdater.hpp"
+#include <Model/AUpdateable.hpp>
+#include <Model/AStepUpdater.hpp>
 
 #include <unordered_set>
 #include <vector>

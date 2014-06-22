@@ -1,6 +1,6 @@
-#include "PhaserRenderer.hpp"
-#include "RenderContext.hpp"
-#include "../RenderFactory.hpp"
+#include <View/Renderer/SDL2/PhaserRenderer.hpp>
+#include <View/Renderer/SDL2/RenderContext.hpp>
+#include <View/Renderer/RenderFactory.hpp>
 
 #include <assert.h>
 
@@ -12,7 +12,7 @@
 using namespace View::Renderer::SDL2;
 
 
-RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SDL2::RenderContext, Model::Phaser, PhaserRenderer )
+RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SDL2::RenderContext, Model::Station::Phaser, PhaserRenderer )
 
 
 void PhaserRenderer::draw() const
@@ -20,7 +20,7 @@ void PhaserRenderer::draw() const
 	std::vector< SDL_Rect > bright;
 	std::vector< SDL_Rect > dark;
 
-	for( const Model::Phaser * m : this->getModels() )
+	for( const Model::Station::Phaser * m : this->getModels() )
 	{
 		SDL_Rect r;
 		r.x = m->getPosition().x - m->getRadius();

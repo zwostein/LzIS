@@ -1,16 +1,15 @@
-#include "Phaser.hpp"
-#include "../EventSystem.hpp"
-#include "../NewObjectEvent.hpp"
-#include "../DeleteObjectEvent.hpp"
-#include "../Net/PulseNode.hpp"
+#include <Model/Station/Phaser.hpp>
+
+#include <Model/EventSystem.hpp>
+#include <Model/Net/PulseNode.hpp>
 
 
-using namespace Model;
+using namespace Model::Station;
 
 
 Phaser::Phaser( EventHandler * eventHandler ) : AStation(eventHandler)
 {
-	this->node = new Net::PulseNode;
+	this->node = new Net::PulseNode( eventHandler );
 	node->setInLinkCapacity( 4 );
 	node->setOutLinkCapacity( 4 );
 	this->dispatch( NewEvent(*this) );

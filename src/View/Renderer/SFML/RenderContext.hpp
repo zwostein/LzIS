@@ -20,10 +20,16 @@ namespace View
 			class RenderContext : public ARenderContext
 			{
 			public:
-				RenderContext( sf::RenderWindow * renderWindow ) : renderWindow(renderWindow) {}
+				RenderContext( Model::EventHandler * eventHandler, sf::RenderWindow * renderWindow ) :
+					ARenderContext(eventHandler),
+					renderWindow(renderWindow)
+				{}
 				virtual ~RenderContext() {}
+
 				virtual std::string getName() const override { return "SFML"; }
+
 				sf::RenderWindow * getRenderWindow() const { return this->renderWindow; }
+
 			private:
 				sf::RenderWindow * renderWindow;
 			};

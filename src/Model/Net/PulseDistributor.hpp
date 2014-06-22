@@ -2,7 +2,7 @@
 #define _MODEL_NET_PULSEDISTRIBUTOR_INCLUDED_
 
 
-#include "../AStepUpdateable.hpp"
+#include <Model/AStepUpdateable.hpp>
 
 #include <vector>
 

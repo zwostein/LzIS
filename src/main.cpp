@@ -8,18 +8,18 @@
 #include <SDL.h>
 //#include <SFML/Graphics.hpp>
 
-#include "Model/Updater.hpp"
-#include "Model/IntervalStepUpdater.hpp"
-#include "Model/Station/SolarPlant.hpp"
-#include "Model/Station/Phaser.hpp"
-#include "Model/Station/Hub.hpp"
-#include "Model/Net/PulseDistributor.hpp"
-#include "Model/Net/PulseNode.hpp"
+#include <Model/Updater.hpp>
+#include <Model/IntervalStepUpdater.hpp>
+#include <Model/Station/SolarPlant.hpp>
+#include <Model/Station/Phaser.hpp>
+#include <Model/Station/Hub.hpp>
+#include <Model/Net/PulseDistributor.hpp>
+#include <Model/Net/PulseNode.hpp>
 
-#include "View/OrderedDrawer.hpp"
-#include "View/Renderer/RenderFactory.hpp"
-#include "View/SDL2/Window.hpp"
-#include "View/SFML/Window.hpp"
+#include <View/OrderedDrawer.hpp>
+#include <View/Renderer/RenderFactory.hpp>
+#include <View/Window/SDL2/Window.hpp>
+#include <View/Window/SFML/Window.hpp>
 
 
 enum MouseMode
@@ -37,13 +37,13 @@ Model::Updater * updater = nullptr;
 Model::IntervalStepUpdater * intervalStepUpdater = nullptr;
 Model::Net::PulseDistributor * pulseDistributor = nullptr;
 
-View::Renderer::ARenderer< Model::SolarPlant > * solarPlantRenderer = nullptr;
-View::Renderer::ARenderer< Model::Phaser > * phaserRenderer = nullptr;
+View::Renderer::ARenderer< Model::Station::SolarPlant > * solarPlantRenderer = nullptr;
+View::Renderer::ARenderer< Model::Station::Phaser > * phaserRenderer = nullptr;
 View::Renderer::ARenderer< Model::Net::PulseLink > * pulseLinkRenderer = nullptr;
 
-std::set< Model::SolarPlant * > solarPlants;
-std::set< Model::Phaser * > phasers;
-std::set< Model::Hub * > hubs;
+std::set< Model::Station::SolarPlant * > solarPlants;
+std::set< Model::Station::Phaser * > phasers;
+//std::set< Model::Station::Hub * > hubs;
 std::set< Model::Net::PulseLink * > links;
 
 
@@ -85,20 +85,20 @@ static T * getAt( const glm::vec2 & pos )
 
 static void click( const glm::vec2 & pos )
 {
-	Model::AStation * obj = getAt<Model::AStation>( pos );
+	Model::Station::AStation * obj = getAt<Model::Station::AStation>( pos );
 	if( obj )
 	{
-		if( typeid( *obj ) == typeid( Model::SolarPlant ) )
-			static_cast< Model::SolarPlant * >( obj )->setPulses( 10 );
-		else if( typeid( *obj ) == typeid( Model::Phaser ) )
-			static_cast< Model::Phaser * >( obj )->setPulses( 0 );
+		if( typeid( *obj ) == typeid( Model::Station::SolarPlant ) )
+			static_cast< Model::Station::SolarPlant * >( obj )->setPulses( 10 );
+		else if( typeid( *obj ) == typeid( Model::Station::Phaser ) )
+			static_cast< Model::Station::Phaser * >( obj )->setPulses( 0 );
 		return;
 	}
 	switch( mouseMode )
 	{
 	case SOLARPLANT:
 	{
-		Model::SolarPlant * m = new Model::SolarPlant();
+		Model::Station::SolarPlant * m = new Model::Station::SolarPlant();
 		m->setPosition( pos );
 		solarPlants.insert( m );
 		updater->addUpdateable( m );
@@ -107,7 +107,7 @@ static void click( const glm::vec2 & pos )
 	}
 	case PHASER:
 	{
-		Model::Phaser * m = new Model::Phaser();
+		Model::Station::Phaser * m = new Model::Station::Phaser();
 		m->setPosition( pos );
 		phasers.insert( m );
 		updater->addUpdateable( m );
@@ -120,7 +120,7 @@ static void click( const glm::vec2 & pos )
 }
 
 
-static Model::AStation * draggedObject = nullptr;
+static Model::Station::AStation * draggedObject = nullptr;
 static Model::Net::APulseNodeActor * linkSource = nullptr;
 static Model::Net::APulseNodeActor * linkSink = nullptr;
 
@@ -133,7 +133,7 @@ static void dragStart( const glm::vec2 & from )
 		case PHASER:
 		case HUB:
 			if( !draggedObject )
-				draggedObject = getAt<Model::AStation>( from );
+				draggedObject = getAt<Model::Station::AStation>( from );
 			break;
 		case LINK:
 		case UNLINK:
@@ -182,7 +182,6 @@ static void dragStop( const glm::vec2 & to )
 				Model::Net::PulseLink * link = new Model::Net::PulseLink;
 				if( Model::Net::PulseNode::setLink( linkSource->getNode(), linkSink->getNode(), link ) )
 				{
-					pulseLinkRenderer->addModel( *link );
 					links.insert( link );
 				}
 			}
@@ -197,7 +196,6 @@ static void dragStop( const glm::vec2 & to )
 				{
 					if( Model::Net::PulseNode::setLink( linkSource->getNode(), linkSink->getNode(), nullptr ) )
 					{
-						pulseLinkRenderer->removeModel( *link );
 						links.erase( link );
 					}
 				}
@@ -209,11 +207,6 @@ static void dragStop( const glm::vec2 & to )
 
 int main( int argc, char ** argv )
 {
-	/*
-	sf::RenderWindow window( sf::VideoMode(800, 600), "LzIS" );
-	window.setVerticalSyncEnabled(true);
-	*/
-
 	View::AWindow * window = new View::SDL2::Window( "LzIS" );
 
 	pulseDistributor = new Model::Net::PulseDistributor;
@@ -226,8 +219,8 @@ int main( int argc, char ** argv )
 	updater->addUpdateable( intervalStepUpdater );
 
 	View::Renderer::ARenderContext * context = window->getContext();
-	solarPlantRenderer = View::Renderer::RenderFactory::newRenderer<Model::SolarPlant>( *context );
-	phaserRenderer = View::Renderer::RenderFactory::newRenderer<Model::Phaser>( *context );
+	solarPlantRenderer = View::Renderer::RenderFactory::newRenderer<Model::Station::SolarPlant>( *context );
+	phaserRenderer = View::Renderer::RenderFactory::newRenderer<Model::Station::Phaser>( *context );
 	pulseLinkRenderer = View::Renderer::RenderFactory::newRenderer<Model::Net::PulseLink>( *context );
 
 	View::OrderedDrawer * drawer = new View::OrderedDrawer;

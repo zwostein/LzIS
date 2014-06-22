@@ -1,7 +1,7 @@
-#include "AStation.hpp"
+#include <Model/Station/AStation.hpp>
 
 
-using namespace Model;
+using namespace Model::Station;
 
 
 AStation::AStation( EventHandler * eventHandler ) : AAutoEventSource( eventHandler )

@@ -5,6 +5,12 @@
 #include <string>
 
 
+namespace Model
+{
+	class EventHandler;
+}
+
+
 namespace View
 {
 	namespace Renderer
@@ -12,7 +18,15 @@ namespace View
 		class ARenderContext
 		{
 		public:
+			ARenderContext( Model::EventHandler * eventHandler = nullptr ) : eventHandler(eventHandler) {}
+			virtual ~ARenderContext() {}
+
 			virtual std::string getName() const = 0;
+
+			Model::EventHandler * getEventHandler() const { return eventHandler; }
+
+		private:
+			Model::EventHandler * eventHandler;
 		};
 	}
 }

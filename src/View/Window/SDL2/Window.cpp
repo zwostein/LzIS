@@ -1,5 +1,5 @@
-#include "Window.hpp"
-#include "../Renderer/SDL2/RenderContext.hpp"
+#include <View/Window/SDL2/Window.hpp>
+#include <View/Renderer/SDL2/RenderContext.hpp>
 
 #include <iostream>
 #include <stdexcept>
@@ -22,7 +22,7 @@ public:
 };
 
 
-Window::Window( const std::string & name ) : pImpl( new Impl )
+Window::Window( const std::string & title, Model::EventHandler * eventHandler ) : AWindow(eventHandler), pImpl( new Impl )
 {
 	if( !SDL_WasInit( SDL_INIT_VIDEO ) )
 		SDL_InitSubSystem( SDL_INIT_VIDEO );
@@ -34,7 +34,7 @@ Window::Window( const std::string & name ) : pImpl( new Impl )
 		SDL_InitSubSystem( SDL_INIT_TIMER );
 
 	this->pImpl->window = SDL_CreateWindow(
-		name.c_str(),           // window title
+		title.c_str(),           // window title
 		SDL_WINDOWPOS_CENTERED, // the x position of the window
 		SDL_WINDOWPOS_CENTERED, // the y position of the window
 		800, 600,               // window width and height
@@ -53,7 +53,7 @@ Window::Window( const std::string & name ) : pImpl( new Impl )
 
 	std::cerr << "SDL2 renderer name: " << info.name << std::endl;
 
-	this->context = new Renderer::SDL2::RenderContext( this->pImpl->renderer );
+	this->context = new Renderer::SDL2::RenderContext( eventHandler, this->pImpl->renderer );
 }
 
 
@@ -70,8 +70,8 @@ void Window::draw() const
 	SDL_SetRenderDrawColor( static_cast< Renderer::SDL2::RenderContext * >(this->context)->getRenderer(), 0, 0, 0, 0 );
 	SDL_RenderClear( static_cast< Renderer::SDL2::RenderContext * >(this->context)->getRenderer() );
 
-	if( this->drawable )
-		this->drawable->draw();
+	if( this->getDrawable() )
+		this->getDrawable()->draw();
 
 	SDL_RenderPresent( static_cast< Renderer::SDL2::RenderContext * >(this->context)->getRenderer() );
 }

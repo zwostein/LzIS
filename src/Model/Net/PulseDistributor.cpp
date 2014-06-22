@@ -1,10 +1,10 @@
-#include "PulseDistributor.hpp"
+#include <Model/Net/PulseDistributor.hpp>
 
-#include "AIterativeDeepeningSearch.hpp"
-#include "APulseConsumer.hpp"
-#include "APulseProvider.hpp"
-#include "PulseNode.hpp"
-#include "PulseLink.hpp"
+#include <Model/Net/AIterativeDeepeningSearch.hpp>
+#include <Model/Net/APulseConsumer.hpp>
+#include <Model/Net/APulseProvider.hpp>
+#include <Model/Net/PulseNode.hpp>
+#include <Model/Net/PulseLink.hpp>
 
 #include <iostream>
 #include <algorithm>
