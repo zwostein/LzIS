@@ -1,8 +1,8 @@
-#ifndef _VIEW_RENDERER_AUNORDEREDRENDERER_INCLUDED_
-#define _VIEW_RENDERER_AUNORDEREDRENDERER_INCLUDED_
+#ifndef _VIEW_RENDERER_AUNORDEREDBATCHRENDERER_INCLUDED_
+#define _VIEW_RENDERER_AUNORDEREDBATCHRENDERER_INCLUDED_
 
 
-#include "ARenderer.hpp"
+#include <View/Renderer/ABatchRenderer.hpp>
 
 #include <set>
 
@@ -12,7 +12,7 @@ namespace View
 	namespace Renderer
 	{
 		template< typename T >
-		class AUnorderedRenderer : public ARenderer< T >
+		class AUnorderedBatchRenderer : public ABatchRenderer< T >
 		{
 		public:
 

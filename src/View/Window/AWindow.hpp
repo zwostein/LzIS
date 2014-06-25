@@ -2,7 +2,7 @@
 #define _VIEW_AWINDOW_INCLUDED_
 
 
-#include <View/ADrawable.hpp>
+#include <View/Renderer/ARenderable.hpp>
 #include <View/Renderer/ARenderContext.hpp>
 
 #include <string>
@@ -16,7 +16,7 @@ namespace Model
 
 namespace View
 {
-	class AWindow : public ADrawable
+	class AWindow : public Renderer::ARenderable
 	{
 	public:
 		AWindow( Model::EventHandler * eventHandler = nullptr ) : eventHandler(eventHandler) {}
@@ -28,14 +28,14 @@ namespace View
 		Model::EventHandler * getEventHandler() const
 			{ return eventHandler; }
 
-		void setDrawable( const ADrawable * drawable )
-			{ this->drawable = drawable; }
-		const ADrawable * getDrawable() const
-			{ return this->drawable; }
+		void setRenderRoot( const ARenderable * renderRoot )
+			{ this->renderRoot = renderRoot; }
+		const ARenderable * getRenderRoot() const
+			{ return this->renderRoot; }
 
 	private:
 		Model::EventHandler * eventHandler;
-		const ADrawable * drawable;
+		const ARenderable * renderRoot;
 	};
 }
 

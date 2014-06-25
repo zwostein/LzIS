@@ -19,11 +19,11 @@ add_executable( ${EXECUTABLE_NAME}
 	src/Model/Station/Phaser.cpp
 	src/Model/Station/Hub.cpp
 
-	src/View/OrderedDrawer.cpp
-	src/View/Renderer/RenderFactory.cpp
-
 	src/View/Window/SDL2/Window.cpp
 	src/View/Window/SFML/Window.cpp
+
+	src/View/Renderer/OrderedRenderNode.cpp
+	src/View/Renderer/RenderFactory.cpp
 
 	src/View/Renderer/SFML/SolarPlantRenderer.cpp
 	src/View/Renderer/SFML/PhaserRenderer.cpp

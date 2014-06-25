@@ -13,16 +13,22 @@ namespace Model
 		class Phaser : public AStation, public Net::APulseConsumer
 		{
 		public:
-			struct NewEvent
+			class NewEvent : public AStation::NewEvent
 			{
-				NewEvent( const Phaser & phaser ) : phaser(phaser) {}
-				const Phaser & phaser;
+			public:
+				NewEvent( const Phaser & phaser ) : AStation::NewEvent(phaser) {}
+				const Phaser & getStation() const { return static_cast<const Phaser &>(AStation::NewEvent::getStation()); }
+			protected:
+				HIERARCHICAL_EVENT( AStation::NewEvent, NewEvent )
 			};
 
-			struct DeleteEvent
+			class DeleteEvent : public AStation::DeleteEvent
 			{
-				DeleteEvent( const Phaser & phaser ) : phaser(phaser) {}
-				const Phaser & phaser;
+			public:
+				DeleteEvent( const Phaser & phaser ) : AStation::DeleteEvent(phaser) {}
+				const Phaser & getStation() const { return static_cast<const Phaser &>(AStation::DeleteEvent::getStation()); }
+			protected:
+				HIERARCHICAL_EVENT( AStation::DeleteEvent, DeleteEvent )
 			};
 
 			Phaser( EventHandler * eventHandler = nullptr );

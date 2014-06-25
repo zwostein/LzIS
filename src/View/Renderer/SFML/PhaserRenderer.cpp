@@ -11,7 +11,7 @@ using namespace View::Renderer::SFML;
 RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SFML::RenderContext, Model::Station::Phaser, PhaserRenderer )
 
 
-void PhaserRenderer::draw() const
+void PhaserRenderer::render() const
 {
 	sf::CircleShape circle( 10.0f );
 	circle.setOrigin( 10.0f, 10.0f );

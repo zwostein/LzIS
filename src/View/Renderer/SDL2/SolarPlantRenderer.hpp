@@ -3,7 +3,7 @@
 
 
 #include <View/Renderer/SDL2/RenderContext.hpp>
-#include <View/Renderer/AUnorderedRenderer.hpp>
+#include <View/Renderer/AUnorderedBatchRenderer.hpp>
 #include <Model/Station/SolarPlant.hpp>
 
 
@@ -14,7 +14,7 @@ namespace View
 		namespace SDL2
 		{
 			class SolarPlantRenderer :
-				public AUnorderedRenderer< Model::Station::SolarPlant >,
+				public AUnorderedBatchRenderer< Model::Station::SolarPlant >,
 				public Model::AAutoEventListener< Model::Station::SolarPlant::NewEvent >,
 				public Model::AAutoEventListener< Model::Station::SolarPlant::DeleteEvent >
 			{
@@ -26,12 +26,12 @@ namespace View
 					{}
 				virtual ~SolarPlantRenderer() {}
 
-				virtual void draw() const override;
+				virtual void render() const override;
 
 				virtual void onEvent( const Model::Station::SolarPlant::NewEvent & event )
-					{ this->addModel( event.solarPlant ); }
+					{ this->addModel( event.getStation() ); }
 				virtual void onEvent( const Model::Station::SolarPlant::DeleteEvent & event )
-					{ this->removeModel( event.solarPlant ); }
+					{ this->removeModel( event.getStation() ); }
 
 			private:
 				RenderContext & context;

@@ -1,8 +1,8 @@
-#ifndef _VIEW_RENDERER_AORDEREDRENDERER_INCLUDED_
-#define _VIEW_RENDERER_AORDEREDRENDERER_INCLUDED_
+#ifndef _VIEW_RENDERER_AORDEREDBATCHRENDERER_INCLUDED_
+#define _VIEW_RENDERER_AORDEREDBATCHRENDERER_INCLUDED_
 
 
-#include "../ADrawable.hpp"
+#include <View/Renderer/ABatchRenderer.hpp>
 
 #include <map>
 
@@ -12,11 +12,11 @@ namespace View
 	namespace Renderer
 	{
 		template< typename T >
-		class AOrderedRenderer : public ADrawable
+		class AOrderedBatchRenderer : public ABatchRenderer< T >
 		{
 		public:
 
-			bool removeModel( const T & model )
+			virtual bool removeModel( const T & model ) override
 			{
 				auto it = modelsAsKeys.find( &model );
 				if( it == modelsAsKeys.end() )
@@ -46,7 +46,7 @@ namespace View
 				return true;
 			}
 
-			bool addModel( const T & model )
+			virtual bool addModel( const T & model ) override
 				{ return addModel( &model, 0 ); }
 
 			const std::multimap< int, const T * > & getModels() const

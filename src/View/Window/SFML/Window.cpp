@@ -34,12 +34,12 @@ Window::~Window()
 }
 
 
-void Window::draw() const
+void Window::render() const
 {
 	this->pImpl->renderWindow->clear( sf::Color::Black );
 
-	if( this->getDrawable() )
-		this->getDrawable()->draw();
+	if( this->getRenderRoot() )
+		this->getRenderRoot()->render();
 
 	this->pImpl->renderWindow->display();
 }

@@ -15,7 +15,7 @@ using namespace View::Renderer::SDL2;
 RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SDL2::RenderContext, Model::Station::Phaser, PhaserRenderer )
 
 
-void PhaserRenderer::draw() const
+void PhaserRenderer::render() const
 {
 	std::vector< SDL_Rect > bright;
 	std::vector< SDL_Rect > dark;

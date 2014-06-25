@@ -2,8 +2,8 @@
 #define _VIEW_RENDERER_RENDERFACTORY_INCLUDED_
 
 
-#include "AUnorderedRenderer.hpp"
-#include "ARenderContext.hpp"
+#include <View/Renderer/ARenderable.hpp>
+#include <View/Renderer/ARenderContext.hpp>
 
 #include <unordered_map>
 #include <typeindex>
@@ -12,7 +12,7 @@
 
 #define RENDERFACTORY_REGISTER_UNORDEREDRENDERER( contextType, modelType, rendererType ) \
 	namespace { \
-		static View::Renderer::ARenderer< modelType > * createRenderer( View::Renderer::ARenderContext & context ) \
+		static View::Renderer::ARenderable * createRenderer( View::Renderer::ARenderContext & context ) \
 		{ \
 			return new rendererType( dynamic_cast<contextType&>( context ) ); \
 		} \
@@ -62,18 +62,18 @@ namespace View
 			typedef std::function< void*(ARenderContext&) > CreatorFunction;
 			typedef std::unordered_map< Key, CreatorFunction, Key::Hash > RendererMap;
 
-			static ADrawable * newRenderer( ModelType modelType, ARenderContext & context )
+			static ARenderable * newRenderer( ModelType modelType, ARenderContext & context )
 			{
 				auto i = renderers.find( Key( typeid(context), modelType ) );
 				if( i == renderers.end() )
 					throw std::runtime_error( "No known renderer for \"" + std::string(modelType.name()) + "\" using \"" + std::string(typeid(context).name()) + "\"" );
-				return static_cast< ADrawable * >( i->second( context ) );
+				return static_cast< ARenderable * >( i->second( context ) );
 			}
 
 			template< typename TModel >
-			static ARenderer< TModel > * newRenderer( ARenderContext & context )
+			static ARenderable * newRenderer( ARenderContext & context )
 			{
-				return static_cast< AUnorderedRenderer< TModel > * >( newRenderer( typeid(TModel), context ) );
+				return newRenderer( typeid(TModel), context );
 			}
 
 			template< typename TModel >

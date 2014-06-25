@@ -17,7 +17,7 @@ namespace Model
 {
 	namespace Net
 	{
-		class PulseNode : public Node< PulseNode, PulseLink >, public AStepUpdateable, public AAutoEventSource
+		class PulseNode : public Node< PulseNode, PulseLink >, public AStepUpdateable, public AutoEventSource
 		{
 		public:
 			struct NewLinkEvent
@@ -34,7 +34,7 @@ namespace Model
 
 			static PulseLink * setLink( PulseNode * source, PulseNode * other, PulseLink * link );
 
-			PulseNode( EventHandler * eventHandler ) : AAutoEventSource( eventHandler ) {}
+			PulseNode( EventHandler * eventHandler ) : AutoEventSource( eventHandler ) {}
 			virtual ~PulseNode() {}
 
 			const glm::vec2 & getPosition() const { return this->position; }

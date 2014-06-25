@@ -3,7 +3,7 @@
 
 
 #include <View/Renderer/SDL2/RenderContext.hpp>
-#include <View/Renderer/AUnorderedRenderer.hpp>
+#include <View/Renderer/AUnorderedBatchRenderer.hpp>
 #include <Model/Net/PulseLink.hpp>
 #include <Model/Net/PulseNode.hpp>
 
@@ -15,7 +15,7 @@ namespace View
 		namespace SDL2
 		{
 			class PulseLinkRenderer :
-				public AUnorderedRenderer< Model::Net::PulseLink >,
+				public AUnorderedBatchRenderer< Model::Net::PulseLink >,
 				public Model::AAutoEventListener< Model::Net::PulseNode::NewLinkEvent >,
 				public Model::AAutoEventListener< Model::Net::PulseNode::DeleteLinkEvent >
 			{
@@ -26,7 +26,7 @@ namespace View
 					context(context)
 					{}
 				virtual ~PulseLinkRenderer() {}
-				virtual void draw() const override;
+				virtual void render() const override;
 
 				virtual void onEvent( const Model::Net::PulseNode::NewLinkEvent & event )
 					{ this->addModel( event.link ); }

@@ -13,7 +13,7 @@ using namespace View::Renderer::SFML;
 RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SFML::RenderContext, Model::Station::SolarPlant, SolarPlantRenderer )
 
 
-void SolarPlantRenderer::draw() const
+void SolarPlantRenderer::render() const
 {
 	sf::CircleShape circle( 10.0f );
 	circle.setOrigin( 10.0f, 10.0f );

@@ -65,13 +65,13 @@ Window::~Window()
 }
 
 
-void Window::draw() const
+void Window::render() const
 {
 	SDL_SetRenderDrawColor( static_cast< Renderer::SDL2::RenderContext * >(this->context)->getRenderer(), 0, 0, 0, 0 );
 	SDL_RenderClear( static_cast< Renderer::SDL2::RenderContext * >(this->context)->getRenderer() );
 
-	if( this->getDrawable() )
-		this->getDrawable()->draw();
+	if( this->getRenderRoot() )
+		this->getRenderRoot()->render();
 
 	SDL_RenderPresent( static_cast< Renderer::SDL2::RenderContext * >(this->context)->getRenderer() );
 }

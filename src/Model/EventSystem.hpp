@@ -8,16 +8,30 @@
 #include <set>
 
 
+#define HIERARCHICAL_EVENT( baseEventType, thisEventType ) \
+	friend EventHandler; \
+	friend GlobalEventHandler; \
+	virtual void _recursiveDispatch( EventHandler * eventHandler = nullptr ) const override \
+	{ \
+		if( eventHandler ) \
+			eventHandler->handle( static_cast<thisEventType>(*this) ); \
+		else \
+			Model::GlobalEventHandler::handle( static_cast<thisEventType>(*this) ); \
+		baseEventType::_recursiveDispatch( eventHandler ); \
+	}
+
+
 namespace Model
 {
 	class EventHandler;
+	class GlobalEventHandler;
 
 
-	class AAutoEventSource
+	class AutoEventSource
 	{
 	public:
-		AAutoEventSource( EventHandler * eventHandler = nullptr ) : eventHandler(eventHandler) {}
-		~AAutoEventSource() {}
+		AutoEventSource( EventHandler * eventHandler = nullptr ) : eventHandler(eventHandler) {}
+		~AutoEventSource() {}
 
 		template< typename TEvent >
 		void dispatch( const TEvent & event );
@@ -51,11 +65,12 @@ namespace Model
 	class AHierarchicalEvent
 	{
 		friend EventHandler;
+		friend GlobalEventHandler;
 	protected:
-		virtual void dispatch() const = 0;
+		virtual void _recursiveDispatch( EventHandler * eventHandler ) const = 0;
 	};
 
-	inline void AHierarchicalEvent::dispatch() const {}
+	inline void AHierarchicalEvent::_recursiveDispatch( EventHandler * eventHandler = nullptr ) const {}
 
 
 	class EventHandler
@@ -72,7 +87,7 @@ namespace Model
 			typename std::enable_if<std::is_base_of< AHierarchicalEvent, TEvent >::value>::type* = nullptr >
 		void dispatch( const TEvent & event )
 		{
-			event.dispatch();
+			event._recursiveDispatch( this );
 		}
 
 		template< typename TEvent >
@@ -116,7 +131,7 @@ namespace Model
 			typename std::enable_if<std::is_base_of< AHierarchicalEvent, TEvent >::value>::type* = nullptr >
 		static void dispatch( const TEvent & event )
 		{
-			event.dispatch();
+			event._recursiveDispatch();
 		}
 
 		template< typename TEvent >
@@ -139,6 +154,7 @@ namespace Model
 		}
 
 	private:
+		GlobalEventHandler();
 		typedef std::type_index EventType;
 		typedef std::set< void * > ListenerSet;
 		typedef std::map< EventType, ListenerSet > ListenerMap;
@@ -166,7 +182,7 @@ namespace Model
 
 
 	template< typename TEvent >
-	void AAutoEventSource::dispatch( const TEvent & event )
+	void AutoEventSource::dispatch( const TEvent & event )
 	{
 		if( this->eventHandler )
 			this->eventHandler->dispatch( event );

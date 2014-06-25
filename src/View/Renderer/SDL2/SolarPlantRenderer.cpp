@@ -13,7 +13,7 @@ using namespace View::Renderer::SDL2;
 RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SDL2::RenderContext, Model::Station::SolarPlant, SolarPlantRenderer )
 
 
-void SolarPlantRenderer::draw() const
+void SolarPlantRenderer::render() const
 {
 	std::vector< SDL_Rect > bright;
 	std::vector< SDL_Rect > dark;

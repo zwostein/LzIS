@@ -3,7 +3,7 @@
 
 
 #include <View/Renderer/SDL2/RenderContext.hpp>
-#include <View/Renderer/AUnorderedRenderer.hpp>
+#include <View/Renderer/AUnorderedBatchRenderer.hpp>
 #include <Model/Station/Phaser.hpp>
 
 
@@ -14,7 +14,7 @@ namespace View
 		namespace SDL2
 		{
 			class PhaserRenderer :
-				public AUnorderedRenderer< Model::Station::Phaser >,
+				public AUnorderedBatchRenderer< Model::Station::Phaser >,
 				public Model::AAutoEventListener< Model::Station::Phaser::NewEvent >,
 				public Model::AAutoEventListener< Model::Station::Phaser::DeleteEvent >
 			{
@@ -26,12 +26,12 @@ namespace View
 					{}
 				virtual ~PhaserRenderer() {}
 
-				virtual void draw() const override;
+				virtual void render() const override;
 
 				virtual void onEvent( const Model::Station::Phaser::NewEvent & event )
-					{ this->addModel( event.phaser ); }
+					{ this->addModel( event.getStation() ); }
 				virtual void onEvent( const Model::Station::Phaser::DeleteEvent & event )
-					{ this->removeModel( event.phaser ); }
+					{ this->removeModel( event.getStation() ); }
 
 			private:
 				RenderContext & context;

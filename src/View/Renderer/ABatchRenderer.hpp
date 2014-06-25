@@ -1,8 +1,8 @@
-#ifndef _VIEW_RENDERER_ARENDERER_INCLUDED_
-#define _VIEW_RENDERER_ARENDERER_INCLUDED_
+#ifndef _VIEW_RENDERER_ABATCHRENDERER_INCLUDED_
+#define _VIEW_RENDERER_ABATCHRENDERER_INCLUDED_
 
 
-#include "../ADrawable.hpp"
+#include <View/Renderer/ARenderable.hpp>
 
 
 namespace View
@@ -10,7 +10,7 @@ namespace View
 	namespace Renderer
 	{
 		template< typename T >
-		class ARenderer : public ADrawable
+		class ABatchRenderer : public ARenderable
 		{
 		public:
 			virtual bool addModel( const T & model ) = 0;

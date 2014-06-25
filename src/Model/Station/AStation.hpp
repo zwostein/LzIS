@@ -13,9 +13,31 @@ namespace Model
 
 	namespace Station
 	{
-		class AStation : public AUpdateable, public AAutoEventSource
+		class AStation : public AUpdateable, public AutoEventSource
 		{
 		public:
+			class NewEvent : public AHierarchicalEvent
+			{
+			public:
+				NewEvent( const AStation & station ) : station(station) {}
+				const AStation & getStation() const { return station; }
+			protected:
+				HIERARCHICAL_EVENT( AHierarchicalEvent, NewEvent )
+			private:
+				const AStation & station;
+			};
+
+			class DeleteEvent : public AHierarchicalEvent
+			{
+			public:
+				DeleteEvent( const AStation & station ) : station(station) {}
+				const AStation & getStation() const { return station; }
+			protected:
+				HIERARCHICAL_EVENT( AHierarchicalEvent, DeleteEvent )
+			private:
+				const AStation & station;
+			};
+
 			AStation( EventHandler * eventHandler = nullptr );
 			virtual ~AStation();
 

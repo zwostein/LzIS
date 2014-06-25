@@ -16,7 +16,7 @@
 #include <Model/Net/PulseDistributor.hpp>
 #include <Model/Net/PulseNode.hpp>
 
-#include <View/OrderedDrawer.hpp>
+#include <View/Renderer/OrderedRenderNode.hpp>
 #include <View/Renderer/RenderFactory.hpp>
 #include <View/Window/SDL2/Window.hpp>
 #include <View/Window/SFML/Window.hpp>
@@ -37,9 +37,9 @@ Model::Updater * updater = nullptr;
 Model::IntervalStepUpdater * intervalStepUpdater = nullptr;
 Model::Net::PulseDistributor * pulseDistributor = nullptr;
 
-View::Renderer::ARenderer< Model::Station::SolarPlant > * solarPlantRenderer = nullptr;
-View::Renderer::ARenderer< Model::Station::Phaser > * phaserRenderer = nullptr;
-View::Renderer::ARenderer< Model::Net::PulseLink > * pulseLinkRenderer = nullptr;
+View::Renderer::ARenderable * solarPlantRenderer = nullptr;
+View::Renderer::ARenderable * phaserRenderer = nullptr;
+View::Renderer::ARenderable * pulseLinkRenderer = nullptr;
 
 std::set< Model::Station::SolarPlant * > solarPlants;
 std::set< Model::Station::Phaser * > phasers;
@@ -205,8 +205,19 @@ static void dragStop( const glm::vec2 & to )
 }
 
 
+class TestListener : Model::AAutoEventListener< Model::Station::AStation::NewEvent >
+{
+	virtual void onEvent( const Model::Station::AStation::NewEvent & event ) override
+	{
+		std::cerr << "AAAaaahhh!!!\n";
+	}
+};
+
+
 int main( int argc, char ** argv )
 {
+	TestListener testListener;
+
 	View::AWindow * window = new View::SDL2::Window( "LzIS" );
 
 	pulseDistributor = new Model::Net::PulseDistributor;
@@ -223,11 +234,11 @@ int main( int argc, char ** argv )
 	phaserRenderer = View::Renderer::RenderFactory::newRenderer<Model::Station::Phaser>( *context );
 	pulseLinkRenderer = View::Renderer::RenderFactory::newRenderer<Model::Net::PulseLink>( *context );
 
-	View::OrderedDrawer * drawer = new View::OrderedDrawer;
-	drawer->addDrawable( pulseLinkRenderer, 0 );
-	drawer->addDrawable( phaserRenderer, 1 );
-	drawer->addDrawable( solarPlantRenderer, 2 );
-	window->setDrawable( drawer );
+	View::Renderer::OrderedRenderNode * drawer = new View::Renderer::OrderedRenderNode;
+	drawer->addRenderable( pulseLinkRenderer, 0 );
+	drawer->addRenderable( phaserRenderer, 1 );
+	drawer->addRenderable( solarPlantRenderer, 2 );
+	window->setRenderRoot( drawer );
 /*
 	sf::Clock clock;
 	while( window.isOpen() )
@@ -435,7 +446,7 @@ int main( int argc, char ** argv )
 
 		updater->update( delta );
 
-		window->draw();
+		window->render();
 	}
 
 	for( auto & solarPlant : solarPlants )

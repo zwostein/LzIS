@@ -25,7 +25,7 @@ namespace View
 			virtual Renderer::ARenderContext * getContext() const override
 				{ return context; }
 
-			virtual void draw() const override;
+			virtual void render() const override;
 
 		private:
 			class Impl;

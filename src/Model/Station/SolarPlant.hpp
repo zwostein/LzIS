@@ -13,16 +13,20 @@ namespace Model
 		class SolarPlant : public AStation, public Net::APulseProvider
 		{
 		public:
-			struct NewEvent
+			struct NewEvent : public AStation::NewEvent
 			{
-				NewEvent( const SolarPlant & solarPlant ) : solarPlant(solarPlant) {}
-				const SolarPlant & solarPlant;
+				NewEvent( const SolarPlant & solarPlant ) : AStation::NewEvent(solarPlant) {}
+				const SolarPlant & getStation() const { return static_cast<const SolarPlant &>(AStation::NewEvent::getStation()); }
+			protected:
+				HIERARCHICAL_EVENT( AStation::NewEvent, NewEvent )
 			};
 
-			struct DeleteEvent
+			struct DeleteEvent : public AStation::DeleteEvent
 			{
-				DeleteEvent( const SolarPlant & solarPlant ) : solarPlant(solarPlant) {}
-				const SolarPlant & solarPlant;
+				DeleteEvent( const SolarPlant & solarPlant ) : AStation::DeleteEvent(solarPlant) {}
+				const SolarPlant & getStation() const { return static_cast<const SolarPlant &>(AStation::DeleteEvent::getStation()); }
+			protected:
+				HIERARCHICAL_EVENT( AStation::DeleteEvent, DeleteEvent )
 			};
 
 			SolarPlant( EventHandler * eventHandler = nullptr );
