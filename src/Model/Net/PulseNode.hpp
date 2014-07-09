@@ -5,7 +5,7 @@
 #include <Model/Net/Node.hpp>
 #include <Model/Net/PulseLink.hpp>
 #include <Model/AStepUpdateable.hpp>
-#include <Model/EventSystem.hpp>
+#include <EventSystem.hpp>
 
 #include <glm/vec2.hpp>
 

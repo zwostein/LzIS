@@ -2,8 +2,10 @@
 #include <typeinfo>
 #include <set>
 
+#define GLM_FORCE_RADIANS
 #include <glm/vec2.hpp>
 #include <glm/geometric.hpp>
+#include <glm/gtx/matrix_transform_2d.hpp>
 
 #include <SDL.h>
 //#include <SFML/Graphics.hpp>
@@ -21,6 +23,13 @@
 #include <View/Window/SDL2/Window.hpp>
 #include <View/Window/SFML/Window.hpp>
 
+#include <View/Renderer/AUnorderedBatchRenderer.hpp>
+
+#include <Controller/StationToolbar.hpp>
+
+#include <Resource/Image.hpp>
+#include <Resource/ImageFileLoader.hpp>
+
 
 enum MouseMode
 {
@@ -36,10 +45,6 @@ MouseMode mouseMode = SOLARPLANT;
 Model::Updater * updater = nullptr;
 Model::IntervalStepUpdater * intervalStepUpdater = nullptr;
 Model::Net::PulseDistributor * pulseDistributor = nullptr;
-
-View::Renderer::ARenderable * solarPlantRenderer = nullptr;
-View::Renderer::ARenderable * phaserRenderer = nullptr;
-View::Renderer::ARenderable * pulseLinkRenderer = nullptr;
 
 std::set< Model::Station::SolarPlant * > solarPlants;
 std::set< Model::Station::Phaser * > phasers;
@@ -205,11 +210,11 @@ static void dragStop( const glm::vec2 & to )
 }
 
 
-class TestListener : Model::AAutoEventListener< Model::Station::AStation::NewEvent >
+class TestListener : AAutoEventListener< Model::Station::AStation::NewEvent >
 {
 	virtual void onEvent( const Model::Station::AStation::NewEvent & event ) override
 	{
-		std::cerr << "AAAaaahhh!!!\n";
+//		std::cerr << "AAAaaahhh!!!\n";
 	}
 };
 
@@ -217,6 +222,9 @@ class TestListener : Model::AAutoEventListener< Model::Station::AStation::NewEve
 int main( int argc, char ** argv )
 {
 	TestListener testListener;
+	Controller::StationToolbar stationToolbar( 0.125, glm::rotate( glm::translate( glm::mat3x3(1.0) ,glm::vec2(0.5,0.5) ), 0.1f ) );
+	stationToolbar.addToolType( Controller::StationToolbar::SOLARPLANT_CREATOR );
+	stationToolbar.addToolType( Controller::StationToolbar::PHASER_CREATOR );
 
 	View::AWindow * window = new View::SDL2::Window( "LzIS" );
 
@@ -230,15 +238,20 @@ int main( int argc, char ** argv )
 	updater->addUpdateable( intervalStepUpdater );
 
 	View::Renderer::ARenderContext * context = window->getContext();
-	solarPlantRenderer = View::Renderer::RenderFactory::newRenderer<Model::Station::SolarPlant>( *context );
-	phaserRenderer = View::Renderer::RenderFactory::newRenderer<Model::Station::Phaser>( *context );
-	pulseLinkRenderer = View::Renderer::RenderFactory::newRenderer<Model::Net::PulseLink>( *context );
 
-	View::Renderer::OrderedRenderNode * drawer = new View::Renderer::OrderedRenderNode;
-	drawer->addRenderable( pulseLinkRenderer, 0 );
-	drawer->addRenderable( phaserRenderer, 1 );
-	drawer->addRenderable( solarPlantRenderer, 2 );
-	window->setRenderRoot( drawer );
+	View::Renderer::ARenderable * solarPlantRenderer = View::Renderer::RenderFactory::newRenderer<Model::Station::SolarPlant>( *context );
+	View::Renderer::ARenderable * phaserRenderer = View::Renderer::RenderFactory::newRenderer<Model::Station::Phaser>( *context );
+	View::Renderer::ARenderable * pulseLinkRenderer = View::Renderer::RenderFactory::newRenderer<Model::Net::PulseLink>( *context );
+	View::Renderer::ARenderable * stationToolbarRenderer = View::Renderer::RenderFactory::newRenderer<Controller::StationToolbar>( *context );
+
+	dynamic_cast< View::Renderer::AUnorderedBatchRenderer<Controller::StationToolbar> & >(*stationToolbarRenderer).addModel(stationToolbar);
+
+	View::Renderer::OrderedRenderNode * renderNode = new View::Renderer::OrderedRenderNode;
+	renderNode->addRenderable( pulseLinkRenderer, 0 );
+	renderNode->addRenderable( phaserRenderer, 1 );
+	renderNode->addRenderable( solarPlantRenderer, 2 );
+	renderNode->addRenderable( stationToolbarRenderer, 3 );
+
 /*
 	sf::Clock clock;
 	while( window.isOpen() )
@@ -345,13 +358,16 @@ int main( int argc, char ** argv )
 	*/
 
 	unsigned int lastTime = 0, currentTime;
-	bool running = true;
-	while( running )
+	while( !window->isCloseRequested() )
 	{
+		static float angle = 0.0f;
+		angle += 0.01f;
+		stationToolbar.setTransform(glm::rotate( glm::translate( glm::mat3x3(1.0) ,glm::vec2(0.5,0.5) ), angle ));
+
 		currentTime = SDL_GetTicks();
 		float delta = (currentTime - lastTime) / 1000.0;
 		lastTime = currentTime;
-
+/*
 		SDL_Event event;
 		while( SDL_PollEvent(&event) )
 		{
@@ -443,10 +459,11 @@ int main( int argc, char ** argv )
 					break;
 			}
 		}
-
+*/
+		window->processEvents();
 		updater->update( delta );
-
-		window->render();
+		renderNode->render();
+		window->display();
 	}
 
 	for( auto & solarPlant : solarPlants )

@@ -15,22 +15,22 @@ namespace View
 		{
 			class PhaserRenderer :
 				public AUnorderedBatchRenderer< Model::Station::Phaser >,
-				public Model::AAutoEventListener< Model::Station::Phaser::NewEvent >,
-				public Model::AAutoEventListener< Model::Station::Phaser::DeleteEvent >
+				public AAutoEventListener< Model::Station::Phaser::NewEvent >,
+				public AAutoEventListener< Model::Station::Phaser::DeleteEvent >
 			{
 			public:
 				PhaserRenderer( RenderContext & context ) :
-					Model::AAutoEventListener< Model::Station::Phaser::NewEvent >( context.getEventHandler() ),
-					Model::AAutoEventListener< Model::Station::Phaser::DeleteEvent >( context.getEventHandler() ),
+					AAutoEventListener< Model::Station::Phaser::NewEvent >( context.getEventHandler() ),
+					AAutoEventListener< Model::Station::Phaser::DeleteEvent >( context.getEventHandler() ),
 					context(context)
 					{}
 				virtual ~PhaserRenderer() {}
 
 				virtual void render() const override;
 
-				virtual void onEvent( const Model::Station::Phaser::NewEvent & event )
+				virtual void onEvent( const Model::Station::Phaser::NewEvent & event ) override
 					{ this->addModel( event.getStation() ); }
-				virtual void onEvent( const Model::Station::Phaser::DeleteEvent & event )
+				virtual void onEvent( const Model::Station::Phaser::DeleteEvent & event ) override
 					{ this->removeModel( event.getStation() ); }
 
 			private:

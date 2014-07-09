@@ -2,15 +2,14 @@
 #define _MODEL_STATION_ASTATION_INCLUDED_
 
 
-#include <Model/ACircle2D.hpp>
 #include <Model/AUpdateable.hpp>
-#include <Model/EventSystem.hpp>
+#include <EventSystem.hpp>
+
+#include <glm/vec2.hpp>
 
 
 namespace Model
 {
-	class EventHandler;
-
 	namespace Station
 	{
 		class AStation : public AUpdateable, public AutoEventSource

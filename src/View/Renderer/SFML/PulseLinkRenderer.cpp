@@ -11,7 +11,7 @@
 using namespace View::Renderer::SFML;
 
 
-RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SFML::RenderContext, Model::Net::PulseLink, PulseLinkRenderer )
+RENDERFACTORY_REGISTER( View::Renderer::SFML::RenderContext, Model::Net::PulseLink, PulseLinkRenderer )
 
 
 void PulseLinkRenderer::render() const

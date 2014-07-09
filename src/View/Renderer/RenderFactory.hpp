@@ -10,14 +10,15 @@
 #include <functional>
 
 
-#define RENDERFACTORY_REGISTER_UNORDEREDRENDERER( contextType, modelType, rendererType ) \
+#define RENDERFACTORY_REGISTER( contextType, modelType, rendererType ) \
 	namespace { \
 		static View::Renderer::ARenderable * createRenderer( View::Renderer::ARenderContext & context ) \
 		{ \
-			return new rendererType( dynamic_cast<contextType&>( context ) ); \
+			return new rendererType( dynamic_cast<contextType&>(context) ); \
 		} \
-		static bool registered = View::Renderer::RenderFactory::registerRenderer<modelType>( \
-			std::type_index(typeid(contextType)), \
+		static bool registered = View::Renderer::RenderFactory::registerRenderer( \
+			typeid(contextType), \
+			typeid(modelType), \
 			View::Renderer::RenderFactory::CreatorFunction( createRenderer ) \
 		); \
 	} \
@@ -30,31 +31,31 @@ namespace View
 		class RenderFactory
 		{
 		public:
-			typedef std::type_index RenderType;
+			typedef std::type_index ContextType;
 			typedef std::type_index ModelType;
 
 			struct Key
 			{
-				Key( RenderType renderType, ModelType modelType ) : renderType(renderType), modelType(modelType) {}
-				RenderType renderType;
+				Key( ContextType contextType, ModelType modelType ) : contextType(contextType), modelType(modelType) {}
+				ContextType contextType;
 				ModelType modelType;
 				bool operator<( const Key & other ) const
 				{
-					if( this->renderType < other.renderType )
+					if( this->contextType < other.contextType )
 						return true;
-					else if( this->renderType > other.renderType )
+					else if( this->contextType > other.contextType )
 						return false;
 					return this->modelType < other.modelType;
 				}
 				bool operator==( const Key & other ) const
 				{
-					return this->renderType == other.renderType && this->modelType == other.modelType;
+					return this->contextType == other.contextType && this->modelType == other.modelType;
 				}
 				struct Hash
 				{
 					size_t operator()( const Key & key ) const
 					{
-						return key.renderType.hash_code() ^ ( key.modelType.hash_code() + 0x9e3779b9 );
+						return key.contextType.hash_code() ^ ( key.modelType.hash_code() + 0x9e3779b9 );
 					}
 				};
 			};
@@ -62,26 +63,31 @@ namespace View
 			typedef std::function< void*(ARenderContext&) > CreatorFunction;
 			typedef std::unordered_map< Key, CreatorFunction, Key::Hash > RendererMap;
 
-			static ARenderable * newRenderer( ModelType modelType, ARenderContext & context )
+			static ARenderable * newRenderer( ARenderContext & context, ModelType modelType )
 			{
 				auto i = renderers.find( Key( typeid(context), modelType ) );
 				if( i == renderers.end() )
-					throw std::runtime_error( "No known renderer for \"" + std::string(modelType.name()) + "\" using \"" + std::string(typeid(context).name()) + "\"" );
+					throw std::runtime_error(
+						"No known renderer for \""
+						+ std::string( modelType.name() )
+						+ "\" using \""
+						+ std::string( typeid(context).name() )
+						+ "\""
+					);
 				return static_cast< ARenderable * >( i->second( context ) );
 			}
 
 			template< typename TModel >
 			static ARenderable * newRenderer( ARenderContext & context )
 			{
-				return newRenderer( typeid(TModel), context );
+				return newRenderer( context, typeid(TModel) );
 			}
 
-			template< typename TModel >
-			static bool registerRenderer( std::type_index contextType, CreatorFunction creator )
+			static bool registerRenderer( ContextType contextType, ModelType modelType, CreatorFunction creator )
 			{
-				if( renderers.count( Key( contextType, std::type_index(typeid(TModel)) ) ) )
+				if( renderers.count( Key( contextType, modelType ) ) )
 					return false;
-				renderers[ Key( contextType, std::type_index(typeid(TModel)) ) ] = creator;
+				renderers[ Key( contextType, modelType ) ] = creator;
 				return true;
 			}
 

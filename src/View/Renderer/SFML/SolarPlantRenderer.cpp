@@ -10,7 +10,7 @@
 using namespace View::Renderer::SFML;
 
 
-RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SFML::RenderContext, Model::Station::SolarPlant, SolarPlantRenderer )
+RENDERFACTORY_REGISTER( View::Renderer::SFML::RenderContext, Model::Station::SolarPlant, SolarPlantRenderer )
 
 
 void SolarPlantRenderer::render() const

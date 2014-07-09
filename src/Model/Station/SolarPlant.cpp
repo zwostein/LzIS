@@ -1,6 +1,6 @@
 #include <Model/Station/SolarPlant.hpp>
 
-#include <Model/EventSystem.hpp>
+#include <EventSystem.hpp>
 #include <Model/Net/PulseNode.hpp>
 
 

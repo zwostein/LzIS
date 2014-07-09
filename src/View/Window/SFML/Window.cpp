@@ -18,12 +18,14 @@ public:
 };
 
 
-Window::Window( const std::string & title, Model::EventHandler * eventHandler ) : AWindow(eventHandler), pImpl( new Impl )
+Window::Window( const std::string & title, EventHandler * eventHandler ) : AWindow(eventHandler), pImpl( new Impl )
 {
 	this->pImpl->renderWindow = new sf::RenderWindow( sf::VideoMode(800, 600), title );
 	this->pImpl->renderWindow->setVerticalSyncEnabled( true );
 
 	this->context = new Renderer::SFML::RenderContext( eventHandler, this->pImpl->renderWindow );
+
+	this->pImpl->renderWindow->clear( sf::Color::Black );
 }
 
 
@@ -34,12 +36,31 @@ Window::~Window()
 }
 
 
-void Window::render() const
+bool Window::isCloseRequested() const
 {
-	this->pImpl->renderWindow->clear( sf::Color::Black );
+	return !this->pImpl->renderWindow->isOpen();
+}
 
-	if( this->getRenderRoot() )
-		this->getRenderRoot()->render();
 
+void Window::processEvents()
+{
+	sf::Event event;
+	while( this->pImpl->renderWindow->pollEvent(event) )
+	{
+		switch( event.type )
+		{
+		case sf::Event::Closed:
+			this->pImpl->renderWindow->close();
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+
+void Window::display()
+{
 	this->pImpl->renderWindow->display();
+	this->pImpl->renderWindow->clear( sf::Color::Black );
 }

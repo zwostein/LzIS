@@ -15,22 +15,22 @@ namespace View
 		{
 			class SolarPlantRenderer :
 				public AUnorderedBatchRenderer< Model::Station::SolarPlant >,
-				public Model::AAutoEventListener< Model::Station::SolarPlant::NewEvent >,
-				public Model::AAutoEventListener< Model::Station::SolarPlant::DeleteEvent >
+				public AAutoEventListener< Model::Station::SolarPlant::NewEvent >,
+				public AAutoEventListener< Model::Station::SolarPlant::DeleteEvent >
 			{
 			public:
 				SolarPlantRenderer( RenderContext & context ) :
-					Model::AAutoEventListener< Model::Station::SolarPlant::NewEvent >( context.getEventHandler() ),
-					Model::AAutoEventListener< Model::Station::SolarPlant::DeleteEvent >( context.getEventHandler() ),
+					AAutoEventListener< Model::Station::SolarPlant::NewEvent >( context.getEventHandler() ),
+					AAutoEventListener< Model::Station::SolarPlant::DeleteEvent >( context.getEventHandler() ),
 					context(context)
 					{}
 				virtual ~SolarPlantRenderer() {}
 
 				virtual void render() const override;
 
-				virtual void onEvent( const Model::Station::SolarPlant::NewEvent & event )
+				virtual void onEvent( const Model::Station::SolarPlant::NewEvent & event ) override
 					{ this->addModel( event.getStation() ); }
-				virtual void onEvent( const Model::Station::SolarPlant::DeleteEvent & event )
+				virtual void onEvent( const Model::Station::SolarPlant::DeleteEvent & event ) override
 					{ this->removeModel( event.getStation() ); }
 
 			private:

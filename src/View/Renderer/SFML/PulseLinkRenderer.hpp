@@ -16,21 +16,21 @@ namespace View
 		{
 			class PulseLinkRenderer :
 				public AUnorderedBatchRenderer< Model::Net::PulseLink >,
-				public Model::AAutoEventListener< Model::Net::PulseNode::NewLinkEvent >,
-				public Model::AAutoEventListener< Model::Net::PulseNode::DeleteLinkEvent >
+				public AAutoEventListener< Model::Net::PulseNode::NewLinkEvent >,
+				public AAutoEventListener< Model::Net::PulseNode::DeleteLinkEvent >
 			{
 			public:
 				PulseLinkRenderer( RenderContext & context ) :
-					Model::AAutoEventListener< Model::Net::PulseNode::NewLinkEvent >( context.getEventHandler() ),
-					Model::AAutoEventListener< Model::Net::PulseNode::DeleteLinkEvent >( context.getEventHandler() ),
+					AAutoEventListener< Model::Net::PulseNode::NewLinkEvent >( context.getEventHandler() ),
+					AAutoEventListener< Model::Net::PulseNode::DeleteLinkEvent >( context.getEventHandler() ),
 					context(context)
 					{}
 				virtual ~PulseLinkRenderer() {}
 				virtual void render() const override;
 
-				virtual void onEvent( const Model::Net::PulseNode::NewLinkEvent & event )
+				virtual void onEvent( const Model::Net::PulseNode::NewLinkEvent & event ) override
 					{ this->addModel( event.link ); }
-				virtual void onEvent( const Model::Net::PulseNode::DeleteLinkEvent & event )
+				virtual void onEvent( const Model::Net::PulseNode::DeleteLinkEvent & event ) override
 					{ this->removeModel( event.link ); }
 
 			private:

@@ -8,7 +8,7 @@
 using namespace View::Renderer::SFML;
 
 
-RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SFML::RenderContext, Model::Station::Phaser, PhaserRenderer )
+RENDERFACTORY_REGISTER( View::Renderer::SFML::RenderContext, Model::Station::Phaser, PhaserRenderer )
 
 
 void PhaserRenderer::render() const

@@ -16,7 +16,7 @@ namespace View
 		class Window : public AWindow
 		{
 		public:
-			Window( const std::string & title, Model::EventHandler * eventHandler = nullptr );
+			Window( const std::string & title, EventHandler * eventHandler = nullptr );
 			virtual ~Window();
 
 			virtual std::string getName() const override
@@ -25,13 +25,16 @@ namespace View
 			virtual Renderer::ARenderContext * getContext() const override
 				{ return context; }
 
-			virtual void render() const override;
+			virtual bool isCloseRequested() const override { return this->closeRequested; }
+			virtual void processEvents() override;
+			virtual void display() override;
 
 		private:
 			class Impl;
 			std::unique_ptr< Impl > pImpl;
 
-			Renderer::ARenderContext * context;
+			Renderer::ARenderContext * context = nullptr;
+			bool closeRequested = false;
 		};
 	}
 }

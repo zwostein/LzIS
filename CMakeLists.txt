@@ -7,7 +7,10 @@ set( EXECUTABLE_NAME "lzis" )
 add_executable( ${EXECUTABLE_NAME}
 	src/main.cpp
 
-	src/Model/EventSystem.cpp
+	src/EventSystem.cpp
+
+	src/Resource/ImageFileLoader.cpp
+
 	src/Model/Updater.cpp
 	src/Model/IntervalStepUpdater.cpp
 
@@ -32,12 +35,15 @@ add_executable( ${EXECUTABLE_NAME}
 	src/View/Renderer/SDL2/SolarPlantRenderer.cpp
 	src/View/Renderer/SDL2/PhaserRenderer.cpp
 	src/View/Renderer/SDL2/PulseLinkRenderer.cpp
+	src/View/Renderer/SDL2/StationToolbarRenderer.cpp
 
 #	src/View/Renderer/GLES2/SolarPlantRenderer.cpp
 #	src/View/Renderer/GLES2/PhaserRenderer.cpp
 #	src/View/Renderer/GLES2/PulseLinkRenderer.cpp
 #	src/View/Renderer/GLES2/Shader.cpp
 #	src/View/Renderer/GLES2/Error.cpp
+
+	src/Controller/StationToolbar.cpp
 )
 
 include_directories( "${CMAKE_SOURCE_DIR}/src" )
@@ -110,8 +116,12 @@ if( NOT EXISTS "${CMAKE_SOURCE_DIR}/external/glm/CMakeLists.txt" )
 else()
 	message( STATUS "Found local GLM in external/glm - Defaulting to NOT use system installation." )
 endif()
-
 option( USE_SYSTEM_GLM "Use system GLM installation" ${USE_SYSTEM_GLM_DEFAULT} )
 if( NOT USE_SYSTEM_GLM )
 	include_directories( "${CMAKE_SOURCE_DIR}/external/glm/" )
 endif()
+
+
+find_package( FreeImage REQUIRED )
+include_directories( ${FREEIMAGE_INCLUDE_PATH} )
+target_link_libraries( ${EXECUTABLE_NAME} ${FREEIMAGE_LIBRARIES} )

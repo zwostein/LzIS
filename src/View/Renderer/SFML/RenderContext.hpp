@@ -20,7 +20,7 @@ namespace View
 			class RenderContext : public ARenderContext
 			{
 			public:
-				RenderContext( Model::EventHandler * eventHandler, sf::RenderWindow * renderWindow ) :
+				RenderContext( EventHandler * eventHandler, sf::RenderWindow * renderWindow ) :
 					ARenderContext(eventHandler),
 					renderWindow(renderWindow)
 				{}

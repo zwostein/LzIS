@@ -12,7 +12,7 @@
 using namespace View::Renderer::SDL2;
 
 
-RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SDL2::RenderContext, Model::Station::Phaser, PhaserRenderer )
+RENDERFACTORY_REGISTER( View::Renderer::SDL2::RenderContext, Model::Station::Phaser, PhaserRenderer )
 
 
 void PhaserRenderer::render() const

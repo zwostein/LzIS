@@ -7,22 +7,28 @@
 
 namespace Controller
 {
-	struct PointerEvent
+	struct PointerDownEvent
 	{
-		enum Type
-		{
-			DOWN,
-			UP,
-			MOTION,
-		};
-		Type type = MOTION;
 		unsigned int device = 0;
-		unsigned int point = 0;
+		unsigned int pointer = 0;
 		unsigned int button = 0;
 		glm::vec2 position;
-		glm::vec2 movement;
-		glm::vec2 drag;
-		float pressure = 0.0f;
+		float pressure = 1.0f;
+	};
+	struct PointerUpEvent
+	{
+		unsigned int device = 0;
+		unsigned int pointer = 0;
+		unsigned int button = 0;
+		glm::vec2 position;
+	};
+	struct PointerMotionEvent
+	{
+		unsigned int device = 0;
+		unsigned int pointer = 0;
+		glm::vec2 position;
+		glm::vec2 delta;
+		float pressure = 1.0f;
 	};
 }
 

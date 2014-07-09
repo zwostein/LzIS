@@ -5,10 +5,7 @@
 #include <string>
 
 
-namespace Model
-{
-	class EventHandler;
-}
+class EventHandler;
 
 
 namespace View
@@ -18,15 +15,16 @@ namespace View
 		class ARenderContext
 		{
 		public:
-			ARenderContext( Model::EventHandler * eventHandler = nullptr ) : eventHandler(eventHandler) {}
+			ARenderContext( EventHandler * eventHandler = nullptr )
+				: eventHandler(eventHandler) {}
 			virtual ~ARenderContext() {}
 
 			virtual std::string getName() const = 0;
 
-			Model::EventHandler * getEventHandler() const { return eventHandler; }
+			EventHandler * getEventHandler() const { return eventHandler; }
 
 		private:
-			Model::EventHandler * eventHandler;
+			EventHandler * eventHandler;
 		};
 	}
 }

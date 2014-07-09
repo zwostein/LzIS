@@ -2,40 +2,29 @@
 #define _VIEW_AWINDOW_INCLUDED_
 
 
-#include <View/Renderer/ARenderable.hpp>
+#include <EventSystem.hpp>
 #include <View/Renderer/ARenderContext.hpp>
+#include <View/Renderer/ARenderable.hpp>
 
 #include <string>
 
 
-namespace Model
-{
-	class EventHandler;
-}
+class EventHandler;
 
 
 namespace View
 {
-	class AWindow : public Renderer::ARenderable
+	class AWindow : public AutoEventSource
 	{
 	public:
-		AWindow( Model::EventHandler * eventHandler = nullptr ) : eventHandler(eventHandler) {}
+		AWindow( EventHandler * eventHandler = nullptr ) : AutoEventSource(eventHandler) {}
 		virtual ~AWindow() {}
 
 		virtual std::string getName() const = 0;
 		virtual Renderer::ARenderContext * getContext() const = 0;
-
-		Model::EventHandler * getEventHandler() const
-			{ return eventHandler; }
-
-		void setRenderRoot( const ARenderable * renderRoot )
-			{ this->renderRoot = renderRoot; }
-		const ARenderable * getRenderRoot() const
-			{ return this->renderRoot; }
-
-	private:
-		Model::EventHandler * eventHandler;
-		const ARenderable * renderRoot;
+		virtual bool isCloseRequested() const = 0;
+		virtual void processEvents() = 0;
+		virtual void display() = 0;
 	};
 }
 

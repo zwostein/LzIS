@@ -11,7 +11,7 @@
 using namespace View::Renderer::SDL2;
 
 
-RENDERFACTORY_REGISTER_UNORDEREDRENDERER( View::Renderer::SDL2::RenderContext, Model::Net::PulseLink, PulseLinkRenderer )
+RENDERFACTORY_REGISTER( View::Renderer::SDL2::RenderContext, Model::Net::PulseLink, PulseLinkRenderer )
 
 
 void PulseLinkRenderer::render() const

@@ -1,7 +1,4 @@
-#include <Model/EventSystem.hpp>
-
-
-using namespace Model;
+#include <EventSystem.hpp>
 
 
 GlobalEventHandler::ListenerMap GlobalEventHandler::listeners = GlobalEventHandler::ListenerMap();
