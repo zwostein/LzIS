@@ -1,6 +1,6 @@
 #include <View/Renderer/SDL2/SolarPlantRenderer.hpp>
-#include <View/Renderer/SDL2/RenderContext.hpp>
-#include <View/Renderer/RenderFactory.hpp>
+#include <View/Renderer/RendererFactory.hpp>
+#include <View/RenderContext/SDL2.hpp>
 
 #include <vector>
 
@@ -10,7 +10,7 @@
 using namespace View::Renderer::SDL2;
 
 
-RENDERFACTORY_REGISTER( View::Renderer::SDL2::RenderContext, Model::Station::SolarPlant, SolarPlantRenderer )
+RENDERERFACTORY_REGISTER_RENDERER( View::RenderContext::SDL2, SolarPlantRenderer, 0 )
 
 
 void SolarPlantRenderer::render() const
@@ -18,7 +18,7 @@ void SolarPlantRenderer::render() const
 	std::vector< SDL_Rect > bright;
 	std::vector< SDL_Rect > dark;
 
-	for( const Model::Station::SolarPlant * m : this->getModels() )
+	for( const Model::Station::SolarPlant * m : this->models )
 	{
 		SDL_Rect r;
 		r.x = m->getPosition().x - m->getRadius();

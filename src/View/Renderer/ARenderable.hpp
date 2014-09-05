@@ -9,6 +9,7 @@ namespace View
 		class ARenderable
 		{
 		public:
+			virtual ~ARenderable() {}
 			virtual void render() const = 0;
 		};
 	}

@@ -2,9 +2,12 @@
 #define _VIEW_RENDERER_SDL2_SOLARPLANTRENDERER_INCLUDED_
 
 
-#include <View/Renderer/SDL2/RenderContext.hpp>
-#include <View/Renderer/AUnorderedBatchRenderer.hpp>
+#include <View/RenderContext/SDL2.hpp>
+#include <View/Renderer/ARenderable.hpp>
+
 #include <Model/Station/SolarPlant.hpp>
+
+#include <unordered_set>
 
 
 namespace View
@@ -14,12 +17,12 @@ namespace View
 		namespace SDL2
 		{
 			class SolarPlantRenderer :
-				public AUnorderedBatchRenderer< Model::Station::SolarPlant >,
+				public ARenderable,
 				public AAutoEventListener< Model::Station::SolarPlant::NewEvent >,
 				public AAutoEventListener< Model::Station::SolarPlant::DeleteEvent >
 			{
 			public:
-				SolarPlantRenderer( RenderContext & context ) :
+				SolarPlantRenderer( RenderContext::SDL2 & context ) :
 					AAutoEventListener< Model::Station::SolarPlant::NewEvent >( context.getEventHandler() ),
 					AAutoEventListener< Model::Station::SolarPlant::DeleteEvent >( context.getEventHandler() ),
 					context(context)
@@ -29,12 +32,13 @@ namespace View
 				virtual void render() const override;
 
 				virtual void onEvent( const Model::Station::SolarPlant::NewEvent & event ) override
-					{ this->addModel( event.getStation() ); }
+					{ this->models.insert( &event.getStation() ); }
 				virtual void onEvent( const Model::Station::SolarPlant::DeleteEvent & event ) override
-					{ this->removeModel( event.getStation() ); }
+					{ this->models.erase( &event.getStation() ); }
 
 			private:
-				RenderContext & context;
+				RenderContext::SDL2 & context;
+				std::unordered_set< const Model::Station::SolarPlant * > models;
 			};
 		}
 	}

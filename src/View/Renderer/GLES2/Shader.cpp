@@ -1,12 +1,9 @@
-#include "Shader.hpp"
+#include <View/Renderer/GLES2/Shader.hpp>
+#include <View/Renderer/GLES2/Error.hpp>
 
-#include "Error.hpp"
+#include <exceptions.hpp>
 
 #include <memory>
-
-
-#define RUNTIME_ERROR( whattext ) \
-	std::runtime_error( std::string(__PRETTY_FUNCTION__) + std::string(": ") + (whattext) );
 
 
 using namespace View::Renderer::GLES2;

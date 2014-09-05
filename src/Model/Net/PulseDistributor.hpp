@@ -2,7 +2,7 @@
 #define _MODEL_NET_PULSEDISTRIBUTOR_INCLUDED_
 
 
-#include <Model/AStepUpdateable.hpp>
+#include <Model/AStepable.hpp>
 
 #include <vector>
 
@@ -16,7 +16,7 @@ namespace Model
 		class PulseNode;
 		class PulseLink;
 
-		class PulseDistributor : public Model::AStepUpdateable
+		class PulseDistributor : public Model::AStepable
 		{
 		public:
 			bool addNode( PulseNode * node );

@@ -2,22 +2,26 @@
 #define _MODEL_UPDATER_INCLUDED_
 
 
-#include <Model/AUpdater.hpp>
 #include <Model/AUpdateable.hpp>
 
-#include <vector>
+#include <memory>
 
 
 namespace Model
 {
-	class Updater : public AUpdater
+	class Updater
 	{
 	public:
-		virtual bool addUpdateable( AUpdateable * updateable ) override;
-		virtual bool removeUpdateable( AUpdateable * updateable ) override;
-		virtual void update( double delta ) override;
+		Updater( AUpdateable & updateable );
+		virtual ~Updater();
+
+		double tick();
+
 	private:
-		std::vector< AUpdateable * > updateables;
+		class Impl;
+		std::unique_ptr< Impl > pImpl;
+
+		AUpdateable & updateable;
 	};
 }
 

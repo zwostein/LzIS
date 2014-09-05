@@ -1,6 +1,8 @@
 #include <View/Renderer/SDL2/PulseLinkRenderer.hpp>
-#include <View/Renderer/SDL2/RenderContext.hpp>
-#include <View/Renderer/RenderFactory.hpp>
+#include <View/RenderContext/SDL2.hpp>
+#include <View/Renderer/RendererFactory.hpp>
+
+#include <Model/Net/PulseLink.hpp>
 #include <Model/Net/PulseNode.hpp>
 
 #include <glm/geometric.hpp>
@@ -11,12 +13,12 @@
 using namespace View::Renderer::SDL2;
 
 
-RENDERFACTORY_REGISTER( View::Renderer::SDL2::RenderContext, Model::Net::PulseLink, PulseLinkRenderer )
+RENDERERFACTORY_REGISTER_RENDERER( View::RenderContext::SDL2, PulseLinkRenderer, 0 )
 
 
 void PulseLinkRenderer::render() const
 {
-	for( const Model::Net::PulseLink * m : this->getModels() )
+	for( const Model::Net::PulseLink * m : this->models )
 	{
 		if( !m->from || !m->to )
 			continue;

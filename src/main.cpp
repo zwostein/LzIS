@@ -7,30 +7,26 @@
 #include <glm/geometric.hpp>
 #include <glm/gtx/matrix_transform_2d.hpp>
 
-#include <SDL.h>
-//#include <SFML/Graphics.hpp>
-
 #include <Model/Updater.hpp>
-#include <Model/IntervalStepUpdater.hpp>
+#include <Model/BatchUpdateNode.hpp>
+#include <Model/IntervalStepper.hpp>
+
 #include <Model/Station/SolarPlant.hpp>
 #include <Model/Station/Phaser.hpp>
 #include <Model/Station/Hub.hpp>
+
 #include <Model/Net/PulseDistributor.hpp>
 #include <Model/Net/PulseNode.hpp>
 
-#include <View/Renderer/OrderedRenderNode.hpp>
-#include <View/Renderer/RenderFactory.hpp>
-#include <View/Window/SDL2/Window.hpp>
-#include <View/Window/SFML/Window.hpp>
-
-#include <View/Renderer/AUnorderedBatchRenderer.hpp>
+#include <View/Renderer/RendererFactory.hpp>
+#include <View/Window/SDL2.hpp>
 
 #include <Controller/StationToolbar.hpp>
 
 #include <Resource/Image.hpp>
 #include <Resource/ImageFileLoader.hpp>
 
-
+/*
 enum MouseMode
 {
 	SOLARPLANT,
@@ -42,13 +38,9 @@ enum MouseMode
 
 MouseMode mouseMode = SOLARPLANT;
 
-Model::Updater * updater = nullptr;
-Model::IntervalStepUpdater * intervalStepUpdater = nullptr;
-Model::Net::PulseDistributor * pulseDistributor = nullptr;
 
 std::set< Model::Station::SolarPlant * > solarPlants;
 std::set< Model::Station::Phaser * > phasers;
-//std::set< Model::Station::Hub * > hubs;
 std::set< Model::Net::PulseLink * > links;
 
 
@@ -73,17 +65,6 @@ static T * getAt( const glm::vec2 & pos )
 		)
 			return i;
 	}
-/*
-	for( auto i : hubs )
-	{
-		if( pos.x > i->getPosition().x - i->getRadius()
-		 && pos.x < i->getPosition().x + i->getRadius()
-		 && pos.y > i->getPosition().y - i->getRadius()
-		 && pos.y < i->getPosition().y + i->getRadius()
-		)
-			return i;
-	}
-*/
 	return nullptr;
 }
 
@@ -106,7 +87,7 @@ static void click( const glm::vec2 & pos )
 		Model::Station::SolarPlant * m = new Model::Station::SolarPlant();
 		m->setPosition( pos );
 		solarPlants.insert( m );
-		updater->addUpdateable( m );
+		updateNode->append( *m );
 		pulseDistributor->addProvider( m );
 		break;
 	}
@@ -115,7 +96,7 @@ static void click( const glm::vec2 & pos )
 		Model::Station::Phaser * m = new Model::Station::Phaser();
 		m->setPosition( pos );
 		phasers.insert( m );
-		updater->addUpdateable( m );
+		updateNode->append( *m );
 		pulseDistributor->addConsumer( m );
 		break;
 	}
@@ -134,16 +115,16 @@ static void dragStart( const glm::vec2 & from )
 {
 	switch( mouseMode )
 	{
-		case SOLARPLANT:
-		case PHASER:
-		case HUB:
-			if( !draggedObject )
-				draggedObject = getAt<Model::Station::AStation>( from );
-			break;
-		case LINK:
-		case UNLINK:
-			linkSource = getAt<Model::Net::APulseNodeActor>( from );
-			break;
+	case SOLARPLANT:
+	case PHASER:
+	case HUB:
+		if( !draggedObject )
+			draggedObject = getAt<Model::Station::AStation>( from );
+		break;
+	case LINK:
+	case UNLINK:
+		linkSource = getAt<Model::Net::APulseNodeActor>( from );
+		break;
 	}
 }
 
@@ -152,16 +133,16 @@ static void drag( const glm::vec2 & to )
 {
 	switch( mouseMode )
 	{
-		case SOLARPLANT:
-		case PHASER:
-		case HUB:
-			if( draggedObject )
-			{
-				draggedObject->setPosition( to );
-			}
-			break;
-		default:
-			break;
+	case SOLARPLANT:
+	case PHASER:
+	case HUB:
+		if( draggedObject )
+		{
+			draggedObject->setPosition( to );
+		}
+		break;
+	default:
+		break;
 	}
 }
 
@@ -170,87 +151,73 @@ static void dragStop( const glm::vec2 & to )
 {
 	switch( mouseMode )
 	{
-		case SOLARPLANT:
-		case PHASER:
-		case HUB:
-			if( draggedObject )
+	case SOLARPLANT:
+	case PHASER:
+	case HUB:
+		if( draggedObject )
+		{
+			draggedObject->setPosition( to );
+			draggedObject = nullptr;
+		}
+		break;
+	case LINK:
+		{
+			linkSink = getAt<Model::Net::APulseNodeActor>( to );
+			if( !linkSource || !linkSink )
+				return;
+			Model::Net::PulseLink * link = new Model::Net::PulseLink;
+			if( Model::Net::PulseNode::setLink( linkSource->getNode(), linkSink->getNode(), link ) )
 			{
-				draggedObject->setPosition( to );
-				draggedObject = nullptr;
+				links.insert( link );
 			}
-			break;
-		case LINK:
+		}
+		break;
+	case UNLINK:
+		{
+			linkSink = getAt<Model::Net::APulseNodeActor>( to );
+			if( !linkSource || !linkSink )
+				return;
+			Model::Net::PulseLink * link = const_cast< Model::Net::PulseLink * >( linkSource->getNode()->getOutLink( linkSink->getNode() ) );
+			if( link )
 			{
-				linkSink = getAt<Model::Net::APulseNodeActor>( to );
-				if( !linkSource || !linkSink )
-					return;
-				Model::Net::PulseLink * link = new Model::Net::PulseLink;
-				if( Model::Net::PulseNode::setLink( linkSource->getNode(), linkSink->getNode(), link ) )
+				if( Model::Net::PulseNode::setLink( linkSource->getNode(), linkSink->getNode(), nullptr ) )
 				{
-					links.insert( link );
+					links.erase( link );
 				}
 			}
-			break;
-		case UNLINK:
-			{
-				linkSink = getAt<Model::Net::APulseNodeActor>( to );
-				if( !linkSource || !linkSink )
-					return;
-				Model::Net::PulseLink * link = const_cast< Model::Net::PulseLink * >( linkSource->getNode()->getOutLink( linkSink->getNode() ) );
-				if( link )
-				{
-					if( Model::Net::PulseNode::setLink( linkSource->getNode(), linkSink->getNode(), nullptr ) )
-					{
-						links.erase( link );
-					}
-				}
-			}
-			break;
+		}
+		break;
 	}
 }
-
-
-class TestListener : AAutoEventListener< Model::Station::AStation::NewEvent >
-{
-	virtual void onEvent( const Model::Station::AStation::NewEvent & event ) override
-	{
-//		std::cerr << "AAAaaahhh!!!\n";
-	}
-};
-
+*/
 
 int main( int argc, char ** argv )
 {
-	TestListener testListener;
+	View::Window::AWindow * window = new View::Window::SDL2( "LzIS", View::Window::SDL2::Context::OpenGLES2 );
+//	View::Window::AWindow * window = new View::Window::SDL2( "LzIS" );
+	View::RenderContext::ARenderContext * context = window->getContext();
+	if( !context )
+	{
+		std::cerr << "Could not create any rendering context!\n";
+		return 1;
+	}
+	View::Renderer::BatchRenderNode * renderNode = View::Renderer::RendererFactory::newRenderer( *context );
+	if( !renderNode )
+	{
+		std::cerr << "Could not create renderer for \"" << context->getName() << "\"!\n";
+		return 1;
+	}
+
+	Model::Net::PulseDistributor pulseDistributor;
+	Model::IntervalStepper netIntervalStepper( pulseDistributor );
+	netIntervalStepper.setInterval( 0.2 );
+	Model::BatchUpdateNode updateNode;
+	updateNode.append( netIntervalStepper );
+	Model::Updater updater( updateNode );
+
 	Controller::StationToolbar stationToolbar( 0.125, glm::rotate( glm::translate( glm::mat3x3(1.0) ,glm::vec2(0.5,0.5) ), 0.1f ) );
 	stationToolbar.addToolType( Controller::StationToolbar::SOLARPLANT_CREATOR );
 	stationToolbar.addToolType( Controller::StationToolbar::PHASER_CREATOR );
-
-	View::AWindow * window = new View::SDL2::Window( "LzIS" );
-
-	pulseDistributor = new Model::Net::PulseDistributor;
-
-	intervalStepUpdater = new Model::IntervalStepUpdater;
-	intervalStepUpdater->setInterval( 0.2 );
-	intervalStepUpdater->addStepUpdateable( pulseDistributor );
-
-	updater = new Model::Updater;
-	updater->addUpdateable( intervalStepUpdater );
-
-	View::Renderer::ARenderContext * context = window->getContext();
-
-	View::Renderer::ARenderable * solarPlantRenderer = View::Renderer::RenderFactory::newRenderer<Model::Station::SolarPlant>( *context );
-	View::Renderer::ARenderable * phaserRenderer = View::Renderer::RenderFactory::newRenderer<Model::Station::Phaser>( *context );
-	View::Renderer::ARenderable * pulseLinkRenderer = View::Renderer::RenderFactory::newRenderer<Model::Net::PulseLink>( *context );
-	View::Renderer::ARenderable * stationToolbarRenderer = View::Renderer::RenderFactory::newRenderer<Controller::StationToolbar>( *context );
-
-	dynamic_cast< View::Renderer::AUnorderedBatchRenderer<Controller::StationToolbar> & >(*stationToolbarRenderer).addModel(stationToolbar);
-
-	View::Renderer::OrderedRenderNode * renderNode = new View::Renderer::OrderedRenderNode;
-	renderNode->addRenderable( pulseLinkRenderer, 0 );
-	renderNode->addRenderable( phaserRenderer, 1 );
-	renderNode->addRenderable( solarPlantRenderer, 2 );
-	renderNode->addRenderable( stationToolbarRenderer, 3 );
 
 /*
 	sf::Clock clock;
@@ -357,16 +324,22 @@ int main( int argc, char ** argv )
 	}
 	*/
 
-	unsigned int lastTime = 0, currentTime;
 	while( !window->isCloseRequested() )
 	{
 		static float angle = 0.0f;
 		angle += 0.01f;
-		stationToolbar.setTransform(glm::rotate( glm::translate( glm::mat3x3(1.0) ,glm::vec2(0.5,0.5) ), angle ));
-
-		currentTime = SDL_GetTicks();
-		float delta = (currentTime - lastTime) / 1000.0;
-		lastTime = currentTime;
+		stationToolbar.setTransform
+		(
+			glm::rotate
+			(
+				glm::translate
+				(
+					glm::mat3x3(1.0),
+					glm::vec2(0.0f,0.0f)
+				),
+				angle
+			)
+		);
 /*
 		SDL_Event event;
 		while( SDL_PollEvent(&event) )
@@ -461,12 +434,8 @@ int main( int argc, char ** argv )
 		}
 */
 		window->processEvents();
-		updater->update( delta );
+		updater.tick();
 		renderNode->render();
 		window->display();
 	}
-
-	for( auto & solarPlant : solarPlants )
-		delete solarPlant;
-	solarPlants.clear();
 }

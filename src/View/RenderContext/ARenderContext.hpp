@@ -1,5 +1,5 @@
-#ifndef _VIEW_RENDERER_ARENDERCONTEXT_INCLUDED_
-#define _VIEW_RENDERER_ARENDERCONTEXT_INCLUDED_
+#ifndef _VIEW_ARENDERCONTEXT_INCLUDED_
+#define _VIEW_ARENDERCONTEXT_INCLUDED_
 
 
 #include <string>
@@ -10,7 +10,7 @@ class EventHandler;
 
 namespace View
 {
-	namespace Renderer
+	namespace RenderContext
 	{
 		class ARenderContext
 		{

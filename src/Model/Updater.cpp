@@ -1,35 +1,36 @@
 #include <Model/Updater.hpp>
 
-#include <algorithm>
+#include <SDL.h>
 
 
 using namespace Model;
 
 
-bool Updater::addUpdateable( AUpdateable * updateable )
+class Updater::Impl
 {
-	auto it = std::find( this->updateables.begin(), this->updateables.end(), updateable );
-	if( it != this->updateables.end() )
-		return false; // already added
+public:
+	unsigned int lastTime = 0;
+};
 
-	this->updateables.push_back( updateable );
-	return true;
+
+Updater::Updater( Model::AUpdateable & updateable ) : pImpl(new Impl), updateable(updateable)
+{
+	if( !SDL_WasInit( SDL_INIT_TIMER ) )
+		SDL_InitSubSystem( SDL_INIT_TIMER );
 }
 
 
-bool Updater::removeUpdateable( AUpdateable * updateable )
+Updater::~Updater()
 {
-	auto it = std::find( this->updateables.begin(), this->updateables.end(), updateable );
-	if( it == this->updateables.end() )
-		return false; // not in list
-
-	this->updateables.erase( it );
-	return true;
 }
 
 
-void Updater::update( double delta )
+double Updater::tick()
 {
-	for( auto & updateable : this->updateables )
-		updateable->update( delta );
+	unsigned int currentTime = SDL_GetTicks();
+	double delta = (currentTime - this->pImpl->lastTime) / 1000.0;
+	this->pImpl->lastTime = currentTime;
+
+	this->updateable.update( delta );
+	return delta;
 }

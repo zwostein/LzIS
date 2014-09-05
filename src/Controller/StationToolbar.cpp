@@ -9,49 +9,48 @@ using namespace Controller;
 
 
 StationToolbar::StationToolbar( float height, const glm::mat3x3 & transform, EventHandler * eventHandler ) :
+	AutoEventSource( eventHandler ),
 	AAutoEventListener< PointerDownEvent >( eventHandler ),
 	AAutoEventListener< PointerUpEvent >( eventHandler ),
-	AAutoEventListener< PointerMotionEvent >( eventHandler ),
-	height(height)
+	AAutoEventListener< PointerMotionEvent >( eventHandler )
 {
 	this->setTransform( transform );
-	this->rectangle.size.y = height;
-	this->rectangle.size.x = height;
+	this->size.y = height;
+	this->size.x = height;
+	this->dispatch( NewEvent(*this) );
 }
 
 
 StationToolbar::~StationToolbar()
 {
-
+	this->dispatch( DeleteEvent(*this) );
 }
 
 
 void StationToolbar::setTransform( const glm::mat3x3 & transform )
 {
-	this->rectangle.transform = transform;
+	this->transform = transform;
 }
 
 
-void StationToolbar::updateRectangles()
+void StationToolbar::updateTools()
 {
-	float toolWidth = height;
+	float toolSize = this->size.y;
+	this->size.x = toolSize * this->tools.size();
 
-	this->rectangle.size.y = height;
-	this->rectangle.size.x = toolWidth * this->tools.size();
-
-	std::cout << "Toolbar size: " << this->rectangle.size.x << "x" << this->rectangle.size.y << "\n";
+	std::cout << "Toolbar size: " << this->size.x << "x" << this->size.y << "\n";
 
 	glm::mat3x3 toolTransform;
 	// left-most tool position
-	toolTransform = glm::translate( toolTransform, glm::vec2( -0.5 * this->rectangle.size.x, 0.0f ) );
+	toolTransform = glm::translate( toolTransform, glm::vec2( -0.5 * this->size.x, 0.0f ) );
 
 	for( auto & p : this->tools )
 	{
 		Tool & tool = p.second;
-		tool.rectangle.size.x = tool.rectangle.size.y = this->rectangle.size.y;
-		tool.rectangle.transform = this->rectangle.transform * toolTransform;
+		tool.size = toolSize;
+		tool.transform = this->transform * toolTransform;
 		// advance to next tool position
-		toolTransform = glm::translate( toolTransform, glm::vec2( toolWidth, 0.0f ) );
+		toolTransform = glm::translate( toolTransform, glm::vec2( toolSize, 0.0f ) );
 	}
 }
 
@@ -64,7 +63,7 @@ bool StationToolbar::addToolType( StationToolbar::ToolType type )
 
 	bool success = tools.insert( std::pair< ToolType, Tool >( type, t ) ).second;
 
-	updateRectangles();
+	updateTools();
 
 	return success;
 }

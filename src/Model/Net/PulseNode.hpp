@@ -4,7 +4,7 @@
 
 #include <Model/Net/Node.hpp>
 #include <Model/Net/PulseLink.hpp>
-#include <Model/AStepUpdateable.hpp>
+#include <Model/AStepable.hpp>
 #include <EventSystem.hpp>
 
 #include <glm/vec2.hpp>
@@ -17,7 +17,7 @@ namespace Model
 {
 	namespace Net
 	{
-		class PulseNode : public Node< PulseNode, PulseLink >, public AStepUpdateable, public AutoEventSource
+		class PulseNode : public Node< PulseNode, PulseLink >, public AStepable, public AutoEventSource
 		{
 		public:
 			struct NewLinkEvent

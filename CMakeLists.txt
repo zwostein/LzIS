@@ -12,7 +12,6 @@ add_executable( ${EXECUTABLE_NAME}
 	src/Resource/ImageFileLoader.cpp
 
 	src/Model/Updater.cpp
-	src/Model/IntervalStepUpdater.cpp
 
 	src/Model/Net/PulseDistributor.cpp
 	src/Model/Net/PulseNode.cpp
@@ -22,15 +21,9 @@ add_executable( ${EXECUTABLE_NAME}
 	src/Model/Station/Phaser.cpp
 	src/Model/Station/Hub.cpp
 
-	src/View/Window/SDL2/Window.cpp
-	src/View/Window/SFML/Window.cpp
+	src/View/Window/SDL2.cpp
 
-	src/View/Renderer/OrderedRenderNode.cpp
-	src/View/Renderer/RenderFactory.cpp
-
-	src/View/Renderer/SFML/SolarPlantRenderer.cpp
-	src/View/Renderer/SFML/PhaserRenderer.cpp
-	src/View/Renderer/SFML/PulseLinkRenderer.cpp
+	src/View/Renderer/RendererFactory.cpp
 
 	src/View/Renderer/SDL2/SolarPlantRenderer.cpp
 	src/View/Renderer/SDL2/PhaserRenderer.cpp
@@ -40,8 +33,9 @@ add_executable( ${EXECUTABLE_NAME}
 #	src/View/Renderer/GLES2/SolarPlantRenderer.cpp
 #	src/View/Renderer/GLES2/PhaserRenderer.cpp
 #	src/View/Renderer/GLES2/PulseLinkRenderer.cpp
-#	src/View/Renderer/GLES2/Shader.cpp
-#	src/View/Renderer/GLES2/Error.cpp
+	src/View/Renderer/GLES2/StationToolbarRenderer.cpp
+	src/View/Renderer/GLES2/Shader.cpp
+	src/View/Renderer/GLES2/Error.cpp
 
 	src/Controller/StationToolbar.cpp
 )

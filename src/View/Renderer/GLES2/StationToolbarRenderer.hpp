@@ -1,23 +1,19 @@
-#ifndef _VIEW_RENDERER_SDL2_STATIONTOOLBARRENDERER_INCLUDED_
-#define _VIEW_RENDERER_SDL2_STATIONTOOLBARRENDERER_INCLUDED_
+#ifndef _VIEW_RENDERER_GLES2_STATIONTOOLBARRENDERER_INCLUDED_
+#define _VIEW_RENDERER_GLES2_STATIONTOOLBARRENDERER_INCLUDED_
 
 
-#include <View/RenderContext/SDL2.hpp>
+#include <View/RenderContext/GLES2.hpp>
 #include <View/Renderer/ARenderable.hpp>
 #include <Controller/StationToolbar.hpp>
 
 #include <unordered_set>
-#include <iostream>
-
-
-struct SDL_Texture;
 
 
 namespace View
 {
 	namespace Renderer
 	{
-		namespace SDL2
+		namespace GLES2
 		{
 			class StationToolbarRenderer :
 				public ARenderable,
@@ -25,7 +21,7 @@ namespace View
 				public AAutoEventListener< Controller::StationToolbar::DeleteEvent >
 			{
 			public:
-				StationToolbarRenderer( RenderContext::SDL2 & context );
+				StationToolbarRenderer( RenderContext::GLES2 & context );
 				virtual ~StationToolbarRenderer();
 
 				virtual void render() const override;
@@ -36,8 +32,7 @@ namespace View
 					{ this->models.erase( &event.getToolbar() ); }
 
 			private:
-				RenderContext::SDL2 & context;
-				SDL_Texture * texture;
+				RenderContext::GLES2 & context;
 				std::unordered_set< const Controller::StationToolbar * > models;
 			};
 		}

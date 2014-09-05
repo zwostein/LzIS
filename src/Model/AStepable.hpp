@@ -4,7 +4,7 @@
 
 namespace Model
 {
-	class AStepUpdateable
+	class AStepable
 	{
 	public:
 		virtual void step() = 0;
