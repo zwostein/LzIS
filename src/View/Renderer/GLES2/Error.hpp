@@ -12,9 +12,12 @@
 	::View::Renderer::GLES2::Error( (error), std::string(__PRETTY_FUNCTION__) + std::string(": ") + (what) )
 
 #ifdef NDEBUG
+	#define GLES2_ERROR_CHECK_UNHANDLED()
 	#define GLES2_ERROR_CHECK( what )
 	#define GLES2_ERROR_CLEAR()
 #else
+	#define GLES2_ERROR_CHECK_UNHANDLED() \
+		::View::Renderer::GLES2::Error::check( std::string(__PRETTY_FUNCTION__) + std::string(": Unhandled previous error") )
 	#define GLES2_ERROR_CHECK( what ) \
 		::View::Renderer::GLES2::Error::check( std::string(__PRETTY_FUNCTION__) + std::string(": ") + (what) )
 	#define GLES2_ERROR_CLEAR() \
@@ -53,11 +56,11 @@ namespace View
 				}
 
 				Error( GLenum error )
-					: std::runtime_error( getErrorString( error ) )
+					: std::runtime_error( this->getErrorString( error ) )
 				{}
 
 				Error( GLenum error, const std::string & what )
-					: std::runtime_error( what + ": " + getErrorString( error ) )
+					: std::runtime_error( what + ": " + this->getErrorString( error ) )
 				{}
 
 				virtual ~Error() {}

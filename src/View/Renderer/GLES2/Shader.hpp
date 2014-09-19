@@ -16,10 +16,18 @@ namespace View
 			class Shader
 			{
 			public:
+				Shader( const Shader & ) = delete;
+				Shader & operator=( const Shader & ) = delete;
+
+				Shader();
 				Shader( GLenum type, const std::string & source );
-				~Shader();
+				virtual ~Shader();
+
+				void load( GLenum type, const std::string & source );
+				GLuint getID() const { return this->id; }
+
 			private:
-				GLuint id;
+				GLuint id = 0;
 			};
 		}
 	}

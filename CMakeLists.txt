@@ -35,7 +35,9 @@ add_executable( ${EXECUTABLE_NAME}
 #	src/View/Renderer/GLES2/PulseLinkRenderer.cpp
 	src/View/Renderer/GLES2/StationToolbarRenderer.cpp
 	src/View/Renderer/GLES2/Shader.cpp
+	src/View/Renderer/GLES2/Program.cpp
 	src/View/Renderer/GLES2/Error.cpp
+	src/View/Renderer/GLES2/Texture2D.cpp
 
 	src/Controller/StationToolbar.cpp
 )

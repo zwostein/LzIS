@@ -5,13 +5,40 @@
 
 #include <memory>
 
+#include <GLES2/gl2.h>
 
+
+using namespace View;
 using namespace View::Renderer::GLES2;
+
+
+Shader::Shader()
+{
+}
 
 
 Shader::Shader( GLenum type, const std::string & source )
 {
-	GLES2_ERROR_CLEAR();
+	this->load( type, source );
+}
+
+
+Shader::~Shader()
+{
+	if( this->id )
+		glDeleteShader( this->id );
+}
+
+
+void Shader::load( GLenum type, const std::string & source )
+{
+	GLES2_ERROR_CHECK_UNHANDLED();
+
+	if( this->id )
+	{
+		glDeleteShader( this->id );
+		GLES2_ERROR_CHECK("glDeleteShader");
+	}
 
 	GLboolean shaderCompilerAvailable;
 	glGetBooleanv( GL_SHADER_COMPILER, &shaderCompilerAvailable );
@@ -40,20 +67,30 @@ Shader::Shader( GLenum type, const std::string & source )
 			std::unique_ptr< GLchar[] > infoLog( new GLchar[infoLen] );
 			glGetShaderInfoLog( this->id, infoLen, NULL, infoLog.get() );
 			GLES2_ERROR_CHECK("glGetShaderInfoLog");
-			std::string log( infoLog.get(), infoLen );
+			std::string log( infoLog.get(), infoLen-1 );
 			glDeleteShader( this->id );
-			throw RUNTIME_ERROR( "Error compiling shader:\n----------------\n"+log+"\n----------------\n" );
+			throw RUNTIME_ERROR
+			(
+				"Error compiling shader:\n"
+				"----------------\n"
+				+source+"\n"
+				"--------\n"
+				"Log:\n"
+				"--------\n"
+				+log+"\n"
+				"----------------\n"
+			);
 		}
 		else
 		{
 			glDeleteShader( this->id );
-			throw RUNTIME_ERROR( "Error compiling shader - no log generated" );
+			throw RUNTIME_ERROR
+			(
+				"Error compiling shader (no log generated):\n"
+				"----------------\n"
+				+source+"\n"
+				"----------------\n"
+			);
 		}
 	}
-}
-
-
-Shader::~Shader()
-{
-	glDeleteShader( this->id );
 }

@@ -20,6 +20,7 @@ namespace View
 			virtual ~ARenderContext() {}
 
 			virtual std::string getName() const = 0;
+			virtual void resize( unsigned int width, unsigned int height ) {}
 
 			EventHandler * getEventHandler() const { return eventHandler; }
 

@@ -4,6 +4,10 @@
 
 #include <View/RenderContext/GLES2.hpp>
 #include <View/Renderer/ARenderable.hpp>
+
+#include <View/Renderer/GLES2/Texture2D.hpp>
+#include <View/Renderer/GLES2/Program.hpp>
+
 #include <Controller/StationToolbar.hpp>
 
 #include <unordered_set>
@@ -33,6 +37,16 @@ namespace View
 
 			private:
 				RenderContext::GLES2 & context;
+				Texture2D texture;
+				Program program;
+				GLint program_aPosition;
+				GLint program_aTexCoord;
+				GLint program_uProjection;
+				GLint program_uModelView;
+				GLint program_uPositionScale;
+				GLint program_uTexCoordScale;
+				GLint program_uTexture;
+				GLuint vertexBuffer;
 				std::unordered_set< const Controller::StationToolbar * > models;
 			};
 		}

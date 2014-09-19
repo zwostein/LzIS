@@ -215,7 +215,7 @@ int main( int argc, char ** argv )
 	updateNode.append( netIntervalStepper );
 	Model::Updater updater( updateNode );
 
-	Controller::StationToolbar stationToolbar( 0.125, glm::rotate( glm::translate( glm::mat3x3(1.0) ,glm::vec2(0.5,0.5) ), 0.1f ) );
+	Controller::StationToolbar stationToolbar( 0.125, glm::mat3x3(1.0) );
 	stationToolbar.addToolType( Controller::StationToolbar::SOLARPLANT_CREATOR );
 	stationToolbar.addToolType( Controller::StationToolbar::PHASER_CREATOR );
 

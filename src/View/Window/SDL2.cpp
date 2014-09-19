@@ -119,6 +119,14 @@ public:
 			this->glContext = SDL_GL_CreateContext( this->window );
 			if( !this->glContext )
 				throw SDL2_ERROR( "Could not create OpenGL context" );
+
+			SDL_GL_MakeCurrent( this->window, this->glContext );
+			SDL_GL_SetSwapInterval( 1 );
+
+			glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+			glClearDepthf( 1.0f );
+			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
 			std::cout << "Vendor      : " << glGetString(GL_VENDOR) << "\n";
 			std::cout << "Renderer    : " << glGetString(GL_RENDERER) << "\n";
 			std::cout << "Version     : " << glGetString(GL_VERSION) << "\n";
@@ -195,21 +203,7 @@ void SDL2::processEvents()
 			switch( sdlEvent.window.event )
 			{
 			case SDL_WINDOWEVENT_RESIZED:
-				{
-					int w = 0, h = 0;
-					SDL_GetWindowSize( this->pImpl->window, &w, &h );
-					int size = std::min<int>( w, h );
-					if( auto sdlContext = dynamic_cast<RenderContext::SDL2*>(this->context) )
-					{
-						sdlContext->setScreenTransform(
-							glm::mat3(
-								0.5f*size, 0.0f,      0.0f,
-								0.0f,     -0.5f*size, 0.0f,
-								0.5f*w,    0.5f*h,    1.0f
-							)
-						);
-					}
-				}
+				this->context->resize( sdlEvent.window.data1, sdlEvent.window.data2 );
 				break;
 			}
 			break;
@@ -299,5 +293,11 @@ void SDL2::display()
 		SDL_RenderPresent( this->pImpl->sdlRenderer );
 		SDL_SetRenderDrawColor( this->pImpl->sdlRenderer, 0, 0, 0, 0 );
 		SDL_RenderClear( this->pImpl->sdlRenderer );
+	}
+	else
+	{
+		SDL_GL_SwapWindow( this->pImpl->window );
+		glClearColor( 0, 0, 1, 1 );
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	}
 }

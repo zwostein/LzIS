@@ -30,6 +30,7 @@ StationToolbar::~StationToolbar()
 void StationToolbar::setTransform( const glm::mat3x3 & transform )
 {
 	this->transform = transform;
+	this->updateTools();
 }
 
 
@@ -38,11 +39,9 @@ void StationToolbar::updateTools()
 	float toolSize = this->size.y;
 	this->size.x = toolSize * this->tools.size();
 
-	std::cout << "Toolbar size: " << this->size.x << "x" << this->size.y << "\n";
-
 	glm::mat3x3 toolTransform;
 	// left-most tool position
-	toolTransform = glm::translate( toolTransform, glm::vec2( -0.5 * this->size.x, 0.0f ) );
+	toolTransform = glm::translate( toolTransform, glm::vec2( -0.5 * (this->size.x - toolSize), 0.0f ) );
 
 	for( auto & p : this->tools )
 	{
